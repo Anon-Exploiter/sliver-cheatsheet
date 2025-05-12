@@ -10,7 +10,6 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 ## Table of Contents
 
 
-- [Table of Contents](#table-of-contents)
 - [Q & A](#q--a)
 - [Installation](#installation)
 	- [Server](#server)
@@ -78,7 +77,7 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 		- [Subnet Access](#subnet-access)
 		- [Port Forwarding through Ligolo](#port-forwarding-through-ligolo)
 - [Lateral Movement](#lateral-movement)
-	- [BOF whoami](#bof-whoami)
+	- [BOF - whoami](#bof---whoami)
 	- [PsExec](#psexec)
 	- [jump-psexec](#jump-psexec)
 	- [jump-wmiexec](#jump-wmiexec)
@@ -146,6 +145,8 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 	- [jump-psexec](#jump-psexec)
 	- [jump-wmiexec](#jump-wmiexec)
 - [Armory Packages List](#armory-packages-list)
+- [Credits](#credits)
+
 
 
 ## Q & A
@@ -228,7 +229,7 @@ sliver > armory install all
 
 
 
-## Generic Stuff
+## Generic
 
 ### Hosts File 
 
@@ -457,7 +458,8 @@ inline-execute-assembly /home/kali/tools/bins/csharp-files/SharpUp.exe audit
 > For application whitelisting, add `-i` for inline-execution
 
 ```powershell
-# Check privs
+# Check privs - using BOF or with execute
+sa-whoami
 execute -o whoami /all
 
 
@@ -626,6 +628,7 @@ execute -o powershell 'Start-Process "C:\Windows\System32\ComputerDefaults.exe"'
 
 # Check privs
 execute -o whoami /priv
+sa-whoami
 
 
 # Get system shell
@@ -653,6 +656,7 @@ execute -o powershell 'Start-Process "C:\Windows\System32\fodhelper.exe"'
 
 # Check privs
 execute -o whoami /priv
+sa-whoami
 
 
 # Get system shell
@@ -1345,24 +1349,28 @@ curl -k --negotiate -u : 'http://machine05.domain.com/Internal/GetCPULoad' -X PO
 
 ## Lateral Movement
 
-### BOF-whoami
-A BOF (Beacon Object File) that runs whoami /all in a more safe way because running it from a shell can trigger an alert in EDRs
+### BOF - whoami
+
+A BOF (Beacon Object File) that runs `whoami /all` in a more safe way because running it from a shell can trigger an alert in EDRs.
+
 ```bash
-sliver (http-OSEP-4444) > sa-whoami 
+sa-whoami 
+
 
 [*] Successfully executed sa-whoami
 [*] Got output:
 
 UserName        SID
 ====================== ====================================
-<SNIF>
+...
 
 
 GROUP INFORMATION                                 Type                     SID                                          Attributes               
 ================================================= ===================== ============================================= ==================================================
 Everyone                                          Well-known group         S-1-1-0                                       Mandatory group, Enabled by default, Enabled group,  
-<SNIF>      
+...      
 ```
+
 
 ### PsExec
 
@@ -2793,6 +2801,12 @@ sliver > armory install all
 ```
 
 
+## Credits
 
+The commands and scripts used throughout the cheatsheet have either been taken out the documentation, manual trial and error or from helpful people from Discord within the OffSec server. If there is any script of yours you'd like to reference to yourself, feel free to make a PR within this section.
 
-[def]: #bof-whoami
+- [Nzf07](https://github.com/Nzf07) for sharing his Sliver notes and for his PRs updating the cheatsheet
+- NoelFrey for reference to `BOF`
+- ArsZilla for execution of `SweetPotato` with `execute-assembly`
+- CrashOverRide for sharing several commands throughout the cheatsheet
+- Anoetic for sharing his Sliver notes
