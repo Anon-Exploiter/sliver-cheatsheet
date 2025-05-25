@@ -10,12 +10,13 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 ## Table of Contents
 
 
+- [Table of Contents](#table-of-contents)
 - [Q & A](#q--a)
 - [Installation](#installation)
 	- [Server](#server)
 	- [Client](#client)
 	- [Armory packages](#armory-packages)
-- [Generic Stuff](#generic-stuff)
+- [Generic](#generic)
 	- [Hosts File](#hosts-file)
 	- [Nmap Scanning](#nmap-scanning)
 	- [Dirsearch](#dirsearch)
@@ -72,6 +73,7 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 		- [Msfconsole](#msfconsole)
 - [Tunneling](#tunneling)
 	- [Portfwd](#portfwd)
+	- [Reverse Port Forwarding](#reverse-port-forwarding)
 	- [Socks5 Proxy](#socks5-proxy)
 	- [Ligolo](#ligolo)
 		- [Subnet Access](#subnet-access)
@@ -122,6 +124,7 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 	- [SQLMap](#sqlmap)
 	- [Queries](#queries)
 	- [MSSQLand](#mssqland)
+		- [Add Custom Command](#add-custom-command)
 	- [MSSQLpwner](#mssqlpwner)
 	- [SQLRecon](#sqlrecon)
 		- [Links Exploitation](#links-exploitation)
@@ -146,6 +149,11 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 	- [jump-wmiexec](#jump-wmiexec)
 - [Armory Packages List](#armory-packages-list)
 - [Credits](#credits)
+
+
+
+
+
 
 
 
@@ -1257,7 +1265,7 @@ portfwd add -b 127.0.0.1:33890 -r 10.10.100.30:3389
 
 ### Reverse Port Forwarding
 Forwarding connections from remote port **7999** to local port **7999**
-```
+```powershell
 sliver (CURIOUS_TRIANGLE) > rportfwd add -b 0.0.0.0:7999 -r 0.0.0.0:7999
 
 [*] Reverse port forwarding 0.0.0.0:7999 <- 0.0.0.0:7999
@@ -1275,13 +1283,13 @@ socks5 start
 
 Verify `/etc/proxychains4.conf`
 
-```
+```powershell
 [ProxyList]
 socks5  127.0.0.1   1081
 ```
 
 Use proxychains4
-```
+```powershell
 sudo proxychains4 -q netexec smb 172.16.103.152
 ```
 
@@ -2210,13 +2218,13 @@ EXECUTE AS LOGIN = 'sa';EXEC sp_configure 'show advanced options', 1; RECONFIGUR
 
 #### Add Custom Command
 1. Locate aliases directory
-```
+```powershell
 /home/kali/.sliver-client/aliases
 ```
 2. Create new folder `mssqland`
 3. Create `alias.json`
 
-```
+```powershell
 {
     "name": "MSSQLand",
     "version": "v1.0",
@@ -2247,7 +2255,7 @@ EXECUTE AS LOGIN = 'sa';EXEC sp_configure 'show advanced options', 1; RECONFIGUR
 4. Paste compiled `MSSQLand.exe`
 5. Restart sliver
 
-```
+```powershell
 $ tree mssqland
 mssqland
 ├── alias.json
