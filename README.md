@@ -1551,6 +1551,14 @@ cd C:/Windows/tasks
 
 # Run the pingcastle tool
 execute-assembly -t 200 /home/kali/tools/bins/PingCastle_3.3.0.1/PingCastle.exe --healthcheck --explore-trust --explore-forest-trust --level Full --no-enum-limit --skip-null-session
+
+
+# Against a domain
+execute-assembly -t 200 /home/kali/tools/bins/PingCastle_3.3.0.1/PingCastle.exe --server mydomain.com --healthcheck --explore-trust --explore-forest-trust --level Full --no-enum-limit --skip-null-session
+
+
+# Generate logs for PingCastle - on disk
+execute-assembly -t 200 /home/kali/tools/bins/PingCastle_3.3.0.1/PingCastle.exe --server mydomain.com --log --healthcheck --explore-trust --explore-forest-trust --level Full --no-enum-limit --skip-null-session
 ```
 
 
