@@ -2899,6 +2899,11 @@ sliver > armory install all
 ```
 
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Anon-Exploiter/sliver-cheatsheet&type=date&legend=top-left)](https://www.star-history.com/#Anon-Exploiter/sliver-cheatsheet&type=date&legend=top-left)
+
+
 ## Credits
 
 The commands and scripts used throughout the cheatsheet have either been taken out the documentation, manual trial and error or from helpful people from Discord within the OffSec server. If there is any script of yours you'd like to reference to yourself, feel free to make a PR within this section.
