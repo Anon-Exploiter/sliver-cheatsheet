@@ -2171,9 +2171,6 @@ psexec -d Title -s Description -p osep-lateral dc02.dev.domain.com
 
 ## MSSQL
 
-> [!NOTE]
-> For why [SQLRecon](https://github.com/skahwah/SQLRecon) falls short (no impersonation across linked servers, architectural limitations), see [MSSQLand's ORIGIN.md](https://github.com/n3rada/MSSQLand/blob/main/ORIGIN.md). Use [MSSQLand](https://github.com/n3rada/MSSQLand) instead.
-
 ### SQLMap
 
 ```powershell
@@ -2218,11 +2215,14 @@ EXECUTE AS LOGIN = 'sa';EXEC sp_configure 'show advanced options', 1; RECONFIGUR
 
 ### MSSQLand
 
-> [MSSQLand](https://github.com/n3rada/MSSQLand) - This is recommended for everything - labs/exam - @n3rada is really active, drop him a message for any bugs
+> [!TIP]
+> [MSSQLand](https://github.com/n3rada/MSSQLand) is recommended for everything (labs/exam). @n3rada is really active, drop him a message for any bugs.
 
-> For external (Linux-side) access with pass-the-hash or Kerberos, use [mssqlclient-ng](https://github.com/n3rada/mssqlclient-ng)
+For external (Linux-side) access with pass-the-hash or Kerberos, use [mssqlclient-ng](https://github.com/n3rada/mssqlclient-ng)
 
-> **Note:** Sliver supports custom aliases
+
+> [!NOTE]
+> For why [SQLRecon](https://github.com/skahwah/SQLRecon) falls short (no impersonation across linked servers, architectural limitations), see [MSSQLand's ORIGIN.md](https://github.com/n3rada/MSSQLand/blob/main/ORIGIN.md). Use [MSSQLand](https://github.com/n3rada/MSSQLand) instead.
 
 #### Add Custom Command
 
@@ -2322,7 +2322,7 @@ execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/dev
 
 ### mssqlclient-ng
 
-> [mssqlclient-ng](https://github.com/n3rada/mssqlclient-ng) — Linux-side MS SQL client. Ideal for PTH, Kerberos, and external access through a SOCKS5 proxy from your beacon.
+> [mssqlclient-ng](https://github.com/n3rada/mssqlclient-ng) - Linux-side MS SQL client. Ideal for PTH, Kerberos, and external access through a SOCKS5 proxy from your beacon.
 
 ```shell
 # Windows authentication with password
