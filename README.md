@@ -2216,7 +2216,7 @@ EXECUTE AS LOGIN = 'sa';EXEC sp_configure 'show advanced options', 1; RECONFIGUR
 ### MSSQLand
 
 > [!TIP]
-> [MSSQLand](https://github.com/n3rada/MSSQLand) is recommended for everything (labs/exam). @n3rada is really active, drop him a message for any bugs.
+> [MSSQLand](https://github.com/n3rada/MSSQLand) is recommended for everything (labs/exam). [@n3rada](https://github.com/n3rada) is really active, drop him a message for any bugs.
 
 For external (Linux-side) access with pass-the-hash or Kerberos, use [mssqlclient-ng](https://github.com/n3rada/mssqlclient-ng)
 
